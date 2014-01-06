@@ -82,4 +82,8 @@ public class Post
     {
         return title;
     }
+    public String toString()
+    {
+        return "Post id: " + this.id;
+    }
 }

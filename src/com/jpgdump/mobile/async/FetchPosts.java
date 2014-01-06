@@ -2,15 +2,18 @@ package com.jpgdump.mobile.async;
 
 import java.util.ArrayList;
 
+import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.implementation.PostManager;
 import com.jpgdump.mobile.interfaces.PostsInterface;
 import com.jpgdump.mobile.objects.Post;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
 {
-
+    private static final String TAG = "FetchPosts";
+    
     @Override
     protected ArrayList<Post> doInBackground(Integer... postParams)
     {
@@ -22,5 +25,14 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
         PostsInterface posts = new PostManager();
         return posts.retrievePosts(postParams[0], postParams[1], "-id", "");
     }
-
+    
+    @Override
+    protected void onPostExecute(ArrayList<Post> posts)
+    {
+        if(BuildConfig.DEBUG)
+        {
+            Log.v(TAG, posts.toString() + "\n");
+            Log.v(TAG, "Done");
+        }
+    }
 }
