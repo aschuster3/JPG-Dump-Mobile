@@ -1,5 +1,7 @@
 package com.jpgdump.mobile.objects;
 
+import android.graphics.Bitmap;
+
 public class Post
 {
     private String kind;
@@ -14,6 +16,7 @@ public class Post
     private String downvotes;
     private String score;
     private String title;
+    private Bitmap thumbnailBitmap = null;
     
     public Post(String kind, String id, String url, String width,
             String height, String created, int safety, String mime,
@@ -81,6 +84,14 @@ public class Post
     public String getTitle()
     {
         return title;
+    }
+    public Bitmap getThumbnailBitmap()
+    {
+        return thumbnailBitmap;
+    }
+    public void setThumbnailBitmap(Bitmap pictureBitmap)
+    {
+        this.thumbnailBitmap = pictureBitmap;
     }
     public String toString()
     {

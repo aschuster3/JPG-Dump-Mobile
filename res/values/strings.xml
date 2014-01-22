@@ -3,6 +3,6 @@
 
     <string name="app_name">JPG Dump Mobile</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="picture_container_grid_display">The the thumbnail for a picture</string>
 
 </resources>

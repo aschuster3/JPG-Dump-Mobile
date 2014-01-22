@@ -7,12 +7,19 @@ import com.jpgdump.mobile.implementation.PostManager;
 import com.jpgdump.mobile.interfaces.PostsInterface;
 import com.jpgdump.mobile.objects.Post;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
 {
     private static final String TAG = "FetchPosts";
+    Activity activity;
+    
+    public FetchPosts(Activity activity)
+    {
+        this.activity = activity;
+    }
     
     @Override
     protected ArrayList<Post> doInBackground(Integer... postParams)
@@ -34,5 +41,6 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
             Log.v(TAG, posts.toString() + "\n");
             Log.v(TAG, "Done");
         }
+        new LoadPictures(activity, posts).execute();
     }
 }
