@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import com.jpgdump.mobile.HomeActivity;
 import com.jpgdump.mobile.R;
+import com.jpgdump.mobile.async.LoadPicture;
 import com.jpgdump.mobile.objects.Post;
+import com.jpgdump.mobile.util.Tags;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -25,6 +27,11 @@ public class GridDisplayAdapter extends BaseAdapter
         this.context = context;
         this.posts = posts;
         this.layout = R.layout.grid_display_panel;
+    }
+    
+    public void addItems(ArrayList<Post> newPosts)
+    {
+        posts.addAll(newPosts);
     }
     
     @Override
@@ -58,6 +65,7 @@ public class GridDisplayAdapter extends BaseAdapter
             
             holder = new DisplayHolder();
             holder.title = (TextView) view.findViewById(R.id.picture_title_grid_display);
+            holder.title.setTextColor(0xCACACA);
             holder.thumbnail = (ImageView) view.findViewById(R.id.picture_container_grid_display);
             
             view.setTag(holder);
@@ -82,14 +90,20 @@ public class GridDisplayAdapter extends BaseAdapter
         }
         
         HomeActivity activity = (HomeActivity) context;
-        if(activity.getBitmapFromMemCache(post.hashCode()) == null)
+        if(post.getThumbnailBitmap() == null)
         {
-            activity.addBitmapToMemoryCache(post.hashCode(), post.getThumbnailBitmap());
-            holder.thumbnail.setImageBitmap(post.getThumbnailBitmap());
+            //Set the loading image and then begin loading
+            holder.thumbnail.setImageBitmap(activity
+                    .getBitmapFromMemCache(Tags.LOADING_BITMAP));
+            
+            if(!post.isDownloading())
+            {
+                new LoadPicture(activity, holder.thumbnail, this).execute(post);
+            }
         }
         else
         {
-            holder.thumbnail.setImageBitmap(activity.getBitmapFromMemCache(post.hashCode()));
+            holder.thumbnail.setImageBitmap(activity.getBitmapFromMemCache(post.getId()));
         }
         
         return view;
