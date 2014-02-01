@@ -1,6 +1,7 @@
 package com.jpgdump.mobile;
 
 import com.jpgdump.mobile.async.FetchPosts;
+import com.jpgdump.mobile.fragments.RetainFragment;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -30,14 +31,24 @@ public class HomeActivity extends Activity
 
         final int cacheSize = maxMemory / 4;
 
-        memoryCache = new LruCache<String, Bitmap>(cacheSize)
+        //A handler for when the orientation changes
+        RetainFragment retainFragment =
+                RetainFragment.findOrCreateRetainFragment(getFragmentManager());
+        
+        memoryCache = retainFragment.mRetainedCache;
+        if(memoryCache == null)
         {
-            @Override
-            protected int sizeOf(String key, Bitmap bitmap)
+            memoryCache = new LruCache<String, Bitmap>(cacheSize)
             {
-                return bitmap.getByteCount() / 1024;
-            }
-        };
+                @Override
+                protected int sizeOf(String key, Bitmap bitmap)
+                {
+                    return bitmap.getByteCount() / 1024;
+                }
+            };
+            
+            retainFragment.mRetainedCache = memoryCache;
+        }
         
         Integer[] postParams = { 10, 0 };
         
@@ -87,5 +98,5 @@ public class HomeActivity extends Activity
         getMenuInflater().inflate(R.menu.home, menu);
         return true;
     }
-
+    
 }

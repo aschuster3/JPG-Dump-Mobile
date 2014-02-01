@@ -7,20 +7,17 @@ import com.jpgdump.mobile.util.PictureManager;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 
 public class LoadPicture extends AsyncTask<Post, Void, Bitmap>
 {   
     HomeActivity activity;
-    ImageView imageView;
     BaseAdapter adapter;
     
     public static int numThreads = 0;
     
-    public LoadPicture(HomeActivity activity, ImageView imageView, BaseAdapter adapter)
+    public LoadPicture(HomeActivity activity, BaseAdapter adapter)
     {
         this.activity = activity;
-        this.imageView = imageView;
         this.adapter = adapter;
         numThreads++;
     }
@@ -34,8 +31,6 @@ public class LoadPicture extends AsyncTask<Post, Void, Bitmap>
         }
         else
         {
-            post[0].setDownloading(true);
-            
             //Fetch the post
             post[0].setThumbnailBitmap(PictureManager
                     .decodeSampleBitmapFromInputStream(
@@ -45,7 +40,6 @@ public class LoadPicture extends AsyncTask<Post, Void, Bitmap>
             activity.addBitmapToMemoryCache(post[0].getId(), 
                                             post[0].getThumbnailBitmap());
             
-            post[0].setDownloading(false);
             return post[0].getThumbnailBitmap();
         }
     }
@@ -60,12 +54,17 @@ public class LoadPicture extends AsyncTask<Post, Void, Bitmap>
     protected void onPostExecute(Bitmap bmp)
     {
         numThreads--;
-        imageView.setImageBitmap(bmp);
         adapter.notifyDataSetChanged();
     }
     
     public static int getNumThreads()
     {
         return numThreads;
+    }
+    
+    /* A flag for PageBottomListener */
+    public static boolean allowDownload()
+    {
+        return numThreads < 4;
     }
 }

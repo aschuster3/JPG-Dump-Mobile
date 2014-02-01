@@ -22,11 +22,19 @@ import android.widget.GridView;
 public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
 {
     private static final String TAG = "FetchPosts";
+    
+    public static boolean pageBottomListenerFlag;
     HomeActivity activity;
     
     public FetchPosts(HomeActivity activity)
     {
         this.activity = activity;
+    }
+    
+    @Override
+    protected void onPreExecute()
+    {
+        pageBottomListenerFlag = false;
     }
     
     @Override
@@ -69,5 +77,17 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
             adapter.addItems(posts);
             adapter.notifyDataSetChanged();
         }
+        
+        for(int x = 0; x < posts.size(); x++)
+        {
+            new LoadPicture(activity, adapter).execute(posts.get(x));
+        }
+        
+        pageBottomListenerFlag = true;
+    }
+    
+    public static boolean allowDownload()
+    {
+        return pageBottomListenerFlag;
     }
 }

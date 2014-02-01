@@ -16,7 +16,6 @@ public class Post
     private String downvotes;
     private String score;
     private String title;
-    private boolean downloading = false;
     private Bitmap thumbnailBitmap = null;
     
     public Post(String kind, String id, String url, String width,
@@ -85,14 +84,6 @@ public class Post
     public String getTitle()
     {
         return title;
-    }
-    public boolean isDownloading()
-    {
-        return downloading;
-    }
-    public void setDownloading(boolean downloading)
-    {
-        this.downloading = downloading;
     }
     public Bitmap getThumbnailBitmap()
     {

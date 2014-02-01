@@ -13,9 +13,6 @@ import android.widget.BaseAdapter;
 public class PageBottomListener implements OnScrollListener
 {
     private static final String TAG = "PageBottomListener";
-    
-    private int currentVisibleItemCount = 0;
-    private int currentScrollState = 0;
 
     private HomeActivity activity;
     private BaseAdapter adapter;
@@ -30,7 +27,13 @@ public class PageBottomListener implements OnScrollListener
     public void onScroll(AbsListView view, int firstVisible, int visibleCount,
             int totalCount)
     {
-        boolean loadMore = /* maybe add a padding */
+        if(BuildConfig.DEBUG)
+        {
+            Log.i(TAG, "Number of non-completed threads: "
+                    + LoadPicture.getNumThreads());
+        }
+        
+        boolean loadMore = 4 +
         firstVisible + visibleCount >= totalCount;
 
         if (loadMore)
@@ -40,20 +43,11 @@ public class PageBottomListener implements OnScrollListener
     }
 
     @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState)
-    {
-       //Not implemented
-    }
+    public void onScrollStateChanged(AbsListView view, int scrollState) { }
 
     private void isScrollCompleted()
-    {
-        if(BuildConfig.DEBUG)
-        {
-            Log.i(TAG, "Number of non-completed threads: "
-                    + LoadPicture.getNumThreads());
-        }
-        
-        if (LoadPicture.getNumThreads() < 4)
+    {   
+        if (LoadPicture.allowDownload() && FetchPosts.allowDownload())
         {
             Integer[] postParams = { 6, adapter.getCount() };
             new FetchPosts(activity).execute(postParams);

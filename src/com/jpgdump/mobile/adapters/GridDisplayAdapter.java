@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 import com.jpgdump.mobile.HomeActivity;
 import com.jpgdump.mobile.R;
-import com.jpgdump.mobile.async.LoadPicture;
 import com.jpgdump.mobile.objects.Post;
 import com.jpgdump.mobile.util.Tags;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +65,7 @@ public class GridDisplayAdapter extends BaseAdapter
             
             holder = new DisplayHolder();
             holder.title = (TextView) view.findViewById(R.id.picture_title_grid_display);
-            holder.title.setTextColor(0xCACACA);
+            holder.title.setTextColor(0xFFCACACA);
             holder.thumbnail = (ImageView) view.findViewById(R.id.picture_container_grid_display);
             
             view.setTag(holder);
@@ -95,15 +95,18 @@ public class GridDisplayAdapter extends BaseAdapter
             //Set the loading image and then begin loading
             holder.thumbnail.setImageBitmap(activity
                     .getBitmapFromMemCache(Tags.LOADING_BITMAP));
-            
-            if(!post.isDownloading())
-            {
-                new LoadPicture(activity, holder.thumbnail, this).execute(post);
-            }
         }
         else
         {
-            holder.thumbnail.setImageBitmap(activity.getBitmapFromMemCache(post.getId()));
+            Bitmap bmp = activity.getBitmapFromMemCache(post.getId());
+            if(bmp == null)
+            {
+                holder.thumbnail.setImageBitmap(post.getThumbnailBitmap());
+            }
+            else
+            {
+                holder.thumbnail.setImageBitmap(activity.getBitmapFromMemCache(post.getId()));
+            }
         }
         
         return view;
