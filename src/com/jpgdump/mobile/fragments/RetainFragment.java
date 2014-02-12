@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.LruCache;
+import android.widget.BaseAdapter;
 
 
 /*
@@ -15,7 +16,9 @@ import android.util.LruCache;
 public class RetainFragment extends Fragment
 {
     private static final String TAG = "RetainFragment";
-    public LruCache<String, Bitmap> mRetainedCache;
+    
+    public LruCache<String, Bitmap> retainedCache;
+    public BaseAdapter retainedAdapter;
 
     public RetainFragment() {}
 

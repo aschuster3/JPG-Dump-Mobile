@@ -4,23 +4,23 @@ import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.HomeActivity;
 import com.jpgdump.mobile.async.FetchPosts;
 import com.jpgdump.mobile.async.LoadPicture;
+import com.jpgdump.mobile.fragments.RetainFragment;
 
 import android.util.Log;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.BaseAdapter;
 
 public class PageBottomListener implements OnScrollListener
 {
     private static final String TAG = "PageBottomListener";
 
     private HomeActivity activity;
-    private BaseAdapter adapter;
+    private RetainFragment retainFragment;
 
-    public PageBottomListener(HomeActivity activity, BaseAdapter adapter)
+    public PageBottomListener(HomeActivity activity, RetainFragment retainFragment)
     {
         this.activity = activity;
-        this.adapter = adapter;
+        this.retainFragment = retainFragment;
     }
 
     @Override
@@ -49,8 +49,8 @@ public class PageBottomListener implements OnScrollListener
     {   
         if (LoadPicture.allowDownload() && FetchPosts.allowDownload())
         {
-            Integer[] postParams = { 6, adapter.getCount() };
-            new FetchPosts(activity).execute(postParams);
+            Integer[] postParams = { 6, retainFragment.retainedAdapter.getCount() };
+            new FetchPosts(activity, retainFragment).execute(postParams);
         }
     }
 

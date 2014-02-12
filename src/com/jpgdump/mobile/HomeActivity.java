@@ -2,6 +2,7 @@ package com.jpgdump.mobile;
 
 import com.jpgdump.mobile.async.FetchPosts;
 import com.jpgdump.mobile.fragments.RetainFragment;
+import com.jpgdump.mobile.listeners.PageBottomListener;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,10 +13,15 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.LruCache;
 import android.view.Menu;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.AbsListView.OnScrollListener;
 
 public class HomeActivity extends Activity
 {
     private LruCache<String, Bitmap> memoryCache;
+    private GridView pictureGrid;
+    private BaseAdapter adapter;
 
 
     @Override
@@ -23,6 +29,8 @@ public class HomeActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        
+        pictureGrid = (GridView)findViewById(R.id.picture_viewer_activity_home);
         
         
         //Instantiate the memory cache, used to later hold bitmaps retrieved
@@ -35,7 +43,8 @@ public class HomeActivity extends Activity
         RetainFragment retainFragment =
                 RetainFragment.findOrCreateRetainFragment(getFragmentManager());
         
-        memoryCache = retainFragment.mRetainedCache;
+        memoryCache = retainFragment.retainedCache;
+        adapter = retainFragment.retainedAdapter;
         if(memoryCache == null)
         {
             memoryCache = new LruCache<String, Bitmap>(cacheSize)
@@ -47,23 +56,29 @@ public class HomeActivity extends Activity
                 }
             };
             
-            retainFragment.mRetainedCache = memoryCache;
-        }
+            retainFragment.retainedCache = memoryCache;
         
-        Integer[] postParams = { 10, 0 };
-        
-        if(isOnline())
-        {
-            new FetchPosts(this).execute(postParams);
+            Integer[] postParams = { 10, 0 };
+            
+            if(isOnline())
+            {
+                new FetchPosts(this, retainFragment).execute(postParams);
+            }
+            else
+            {
+                //Handle not being connected
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.no_internet_dialog_title);
+                builder.setMessage(R.string.no_internet_dialog_message);
+                builder.setPositiveButton(R.string.no_internet_dialog_positive, null);
+                builder.setNegativeButton(R.string.no_internet_dialog_negative, null);
+            }
         }
         else
         {
-            //Handle not being connected
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.no_internet_dialog_title);
-            builder.setMessage(R.string.no_internet_dialog_message);
-            builder.setPositiveButton(R.string.no_internet_dialog_positive, null);
-            builder.setNegativeButton(R.string.no_internet_dialog_negative, null);
+            OnScrollListener scrollListener = new PageBottomListener(this, retainFragment);
+            pictureGrid.setAdapter(adapter);
+            pictureGrid.setOnScrollListener(scrollListener);
         }
     }
 

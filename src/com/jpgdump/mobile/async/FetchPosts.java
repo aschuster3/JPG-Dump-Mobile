@@ -6,6 +6,7 @@ import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.HomeActivity;
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.adapters.GridDisplayAdapter;
+import com.jpgdump.mobile.fragments.RetainFragment;
 import com.jpgdump.mobile.implementation.PostManager;
 import com.jpgdump.mobile.interfaces.PostsInterface;
 import com.jpgdump.mobile.listeners.PageBottomListener;
@@ -24,11 +25,14 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
     private static final String TAG = "FetchPosts";
     
     public static boolean pageBottomListenerFlag;
-    HomeActivity activity;
     
-    public FetchPosts(HomeActivity activity)
+    HomeActivity activity;
+    RetainFragment retainFragment;
+    
+    public FetchPosts(HomeActivity activity, RetainFragment retainFragment)
     {
         this.activity = activity;
+        this.retainFragment = retainFragment;
     }
     
     @Override
@@ -67,7 +71,7 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
         if(adapter == null)
         {
             adapter = new GridDisplayAdapter(activity, posts);
-            OnScrollListener scrollListener = new PageBottomListener(activity, adapter);
+            OnScrollListener scrollListener = new PageBottomListener(activity, retainFragment);
             
             grid.setAdapter(adapter);
             grid.setOnScrollListener(scrollListener);
@@ -77,6 +81,13 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
             adapter.addItems(posts);
             adapter.notifyDataSetChanged();
         }
+
+        retainFragment.retainedAdapter = adapter;
+        
+        /*
+         * Add posts as a variable to the retainFragment
+         * 
+         */
         
         for(int x = 0; x < posts.size(); x++)
         {
