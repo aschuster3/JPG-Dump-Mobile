@@ -5,6 +5,7 @@ import com.jpgdump.mobile.HomeActivity;
 import com.jpgdump.mobile.async.FetchPosts;
 import com.jpgdump.mobile.async.LoadPicture;
 import com.jpgdump.mobile.fragments.RetainFragment;
+import com.jpgdump.mobile.util.Tags;
 
 import android.util.Log;
 import android.widget.AbsListView;
@@ -49,7 +50,7 @@ public class PageBottomListener implements OnScrollListener
     {   
         if (LoadPicture.allowDownload() && FetchPosts.allowDownload())
         {
-            Integer[] postParams = { 6, retainFragment.retainedAdapter.getCount() };
+            Integer[] postParams = { Tags.ADD_POSTS, retainFragment.retainedAdapter.getCount() };
             new FetchPosts(activity, retainFragment).execute(postParams);
         }
     }

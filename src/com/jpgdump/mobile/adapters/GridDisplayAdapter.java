@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.jpgdump.mobile.HomeActivity;
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.objects.Post;
-import com.jpgdump.mobile.util.Tags;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -21,6 +20,8 @@ public class GridDisplayAdapter extends BaseAdapter
     Context context;
     ArrayList<Post> posts;
     int layout;
+    
+    public static final boolean DEBUG = false;
     
     public GridDisplayAdapter(Context context, ArrayList<Post> posts)
     {
@@ -90,22 +91,37 @@ public class GridDisplayAdapter extends BaseAdapter
         }
         
         HomeActivity activity = (HomeActivity) context;
-        if(post.getThumbnailBitmap() == null)
+        Bitmap bmp = activity.getBitmapFromMemCache(post.getId());
+        if(bmp == null)
         {
-            //Set the loading image and then begin loading
-            holder.thumbnail.setImageBitmap(activity
-                    .getBitmapFromMemCache(Tags.LOADING_BITMAP));
-        }
-        else
-        {
-            Bitmap bmp = activity.getBitmapFromMemCache(post.getId());
+            bmp = activity.getBitmapFromDiskCache(post.getId());
             if(bmp == null)
             {
-                holder.thumbnail.setImageBitmap(post.getThumbnailBitmap());
+                //Set the loading image and then begin loading
+                
+                holder.thumbnail.setImageResource(R.drawable.no_image_classifier);
             }
             else
             {
-                holder.thumbnail.setImageBitmap(activity.getBitmapFromMemCache(post.getId()));
+                if(DEBUG)
+                {
+                    holder.thumbnail.setImageResource(R.drawable.disk_image_classifier);
+                }
+                else
+                {
+                    holder.thumbnail.setImageBitmap(bmp);
+                }
+            }
+        }
+        else
+        {
+            if(DEBUG)
+            {
+                holder.thumbnail.setImageResource(R.drawable.mem_image_classifier);
+            }
+            else
+            {
+                holder.thumbnail.setImageBitmap(bmp);
             }
         }
         

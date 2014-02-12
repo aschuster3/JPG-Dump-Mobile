@@ -81,4 +81,29 @@ public class PictureManager
         return bmp;
 
     }
+    
+    public static Bitmap decodeBitmapFromInputStream(String url)
+    {
+        InputStream is = null;
+        try
+        {
+            is = InternetTools.openHttpConnection(url);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+        Bitmap bmp = BitmapFactory.decodeStream(is);
+        
+        try
+        {
+            is.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return bmp;
+    }
 }

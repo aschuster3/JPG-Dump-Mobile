@@ -11,10 +11,7 @@ import com.jpgdump.mobile.implementation.PostManager;
 import com.jpgdump.mobile.interfaces.PostsInterface;
 import com.jpgdump.mobile.listeners.PageBottomListener;
 import com.jpgdump.mobile.objects.Post;
-import com.jpgdump.mobile.util.Tags;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.AbsListView.OnScrollListener;
@@ -51,10 +48,6 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
         
         PostsInterface posts = new PostManager();
         
-        //Get the temporary loading image and add it to the memory cache 
-        Bitmap loadingPic = BitmapFactory.decodeResource(activity.getResources(), R.drawable.jpg_dump_temp_loading_pic);
-        activity.addBitmapToMemoryCache(Tags.LOADING_BITMAP, loadingPic);
-        
         return posts.retrievePosts(postParams[0], postParams[1], "-id", "");
     }
     
@@ -89,12 +82,13 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
          * 
          */
         
-        for(int x = 0; x < posts.size(); x++)
+        int postSize = posts.size();
+        for(int x = 0; x < postSize; x++)
         {
             new LoadPicture(activity, adapter).execute(posts.get(x));
+            
+            pageBottomListenerFlag = (postSize - x) < 4;
         }
-        
-        pageBottomListenerFlag = true;
     }
     
     public static boolean allowDownload()

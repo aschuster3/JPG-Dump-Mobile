@@ -25,22 +25,21 @@ public class LoadPicture extends AsyncTask<Post, Void, Bitmap>
     @Override
     protected Bitmap doInBackground(Post... post)
     {
-        if(isCancelled())
+        if(isCancelled() || activity.diskLruCacheContainsKey(post[0].getId()))
         {
             return null;
         }
         else
         {
             //Fetch the post
-            post[0].setThumbnailBitmap(PictureManager
-                    .decodeSampleBitmapFromInputStream(
-                            post[0].getUrl(), 150, 150));
+            Bitmap bmp = PictureManager.decodeSampleBitmapFromInputStream(
+                            post[0].getUrl(), 150, 150);
             
             //Add to the cache
             activity.addBitmapToMemoryCache(post[0].getId(), 
-                                            post[0].getThumbnailBitmap());
+                                            bmp);
             
-            return post[0].getThumbnailBitmap();
+            return bmp;
         }
     }
     

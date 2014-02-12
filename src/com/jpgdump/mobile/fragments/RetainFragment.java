@@ -1,5 +1,8 @@
 package com.jpgdump.mobile.fragments;
 
+import com.jpgdump.mobile.util.DiskLruImageCache;
+import com.jpgdump.mobile.util.Tags;
+
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.graphics.Bitmap;
@@ -14,21 +17,20 @@ import android.widget.BaseAdapter;
  * display views.
  */
 public class RetainFragment extends Fragment
-{
-    private static final String TAG = "RetainFragment";
-    
+{    
     public LruCache<String, Bitmap> retainedCache;
+    public DiskLruImageCache retainedDiskCache;
     public BaseAdapter retainedAdapter;
 
     public RetainFragment() {}
 
     public static RetainFragment findOrCreateRetainFragment(FragmentManager fm)
     {
-        RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
+        RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(Tags.RETAIN_FRAG);
         if (fragment == null)
         {
             fragment = new RetainFragment();
-            fm.beginTransaction().add(fragment, TAG).commit();
+            fm.beginTransaction().add(fragment, Tags.RETAIN_FRAG).commit();
         }
         return fragment;
     }
