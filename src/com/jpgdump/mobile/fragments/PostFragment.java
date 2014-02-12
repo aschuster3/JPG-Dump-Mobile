@@ -2,12 +2,16 @@ package com.jpgdump.mobile.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.objects.Post;
 
 public class PostFragment extends Fragment
 {
-    private Post post;
+   // private Post post;
     
     public static PostFragment newInstance(Post post)
     {
@@ -36,13 +40,22 @@ public class PostFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Bundle bundle = getArguments();
+//        Bundle bundle = getArguments();
         
-        post = new Post(bundle.getString("kind"), bundle.getString("id"),
-                bundle.getString("url"), bundle.getString("width"), bundle.getString("height"),
-                bundle.getString("created"), bundle.getInt("safety"), bundle.getString("mime"),
-                bundle.getString("upvotes"), bundle.getString("downvotes"),
-                bundle.getString("score"), bundle.getString("title"));
+//        post = new Post(bundle.getString("kind"), bundle.getString("id"),
+//                bundle.getString("url"), bundle.getString("width"), bundle.getString("height"),
+//                bundle.getString("created"), bundle.getInt("safety"), bundle.getString("mime"),
+//                bundle.getString("upvotes"), bundle.getString("downvotes"),
+//                bundle.getString("score"), bundle.getString("title"));
+    }
+    
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.post_fragment_layout, container,
+                false);
+        return view;
     }
 }
 
