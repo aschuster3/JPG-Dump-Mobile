@@ -2,6 +2,7 @@ package com.jpgdump.mobile.listeners;
 
 import com.jpgdump.mobile.FullPictureViewActivity;
 import com.jpgdump.mobile.objects.Post;
+import com.jpgdump.mobile.util.Tags;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -29,8 +30,9 @@ public class GridPressListener implements OnItemClickListener
         intent.putExtra("upvotes", post.getUpvotes());
         intent.putExtra("downvotes", post.getDownvotes());
         intent.putExtra("title", post.getTitle());
+        intent.putExtra("position", position);
         
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, Tags.POST_REQUEST_CODE);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.jpgdump.mobile;
 
 import com.jpgdump.mobile.listeners.GoatPressListener;
+import com.jpgdump.mobile.util.Tags;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,7 +49,7 @@ public class FullPictureViewActivity extends FragmentActivity
         
         //Put the title of the post at the top (if it exists)
         title = (TextView) findViewById(R.id.picture_title);
-        if(titleStr == null) 
+        if(titleStr.equals("")) 
             { title.setVisibility(View.GONE);}
         else 
             { title.setText(titleStr);}
@@ -67,7 +68,20 @@ public class FullPictureViewActivity extends FragmentActivity
         fullImage.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
     }
     
-    public void setGoatAmount(int goatTotal)
+    @Override
+    public void onBackPressed()
+    {
+        int position = getIntent().getIntExtra("position", -1);
+        int goatVal = getIntent().getIntExtra("goatVal", 0);
+        
+        Intent data = new Intent();
+        data.putExtra("position", position);
+        data.putExtra("goatVal", goatVal);
+        setResult(Tags.RESULT_OK, data);
+        finish();
+    }
+    
+    private void setGoatAmount(int goatTotal)
     {
         goatCount.setText("" + goatTotal);
         

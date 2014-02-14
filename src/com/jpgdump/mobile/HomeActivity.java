@@ -7,6 +7,7 @@ import com.jpgdump.mobile.async.FetchPosts;
 import com.jpgdump.mobile.fragments.RetainFragment;
 import com.jpgdump.mobile.listeners.GridPressListener;
 import com.jpgdump.mobile.listeners.PageBottomListener;
+import com.jpgdump.mobile.objects.Post;
 import com.jpgdump.mobile.util.DiskLruImageCache;
 import com.jpgdump.mobile.util.Tags;
 
@@ -18,6 +19,7 @@ import android.os.Environment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -127,19 +129,31 @@ public class HomeActivity extends Activity
 
     public void addBitmapToMemoryCache(String key, Bitmap bitmap)
     {
-        // Add to mem cache
-        if (getBitmapFromMemCache(key) == null)
+        if(BuildConfig.DEBUG)
         {
-            memoryCache.put(key, bitmap);
+            Log.i("HomeActivity", "Key value: " + key);
+            if(bitmap == null)
+            {
+                Log.i("HomeActivity", "Bitmap is null");
+            }
         }
         
-        // Also add to disk cache
-        synchronized (diskCacheLock)
+        if(bitmap != null)
         {
-            if (diskLruCache != null && !diskLruCache.containsKey(key))
+            // Add to mem cache
+            if (getBitmapFromMemCache(key) == null)
             {
-                Log.i("Home Activity", "Cache is being added to");
-                diskLruCache.put(key, bitmap);
+                memoryCache.put(key, bitmap);
+            }
+            
+            // Also add to disk cache
+            synchronized (diskCacheLock)
+            {
+                if (diskLruCache != null && !diskLruCache.containsKey(key))
+                {
+                    Log.i("Home Activity", "Cache is being added to");
+                    diskLruCache.put(key, bitmap);
+                }
             }
         }
 
@@ -203,6 +217,46 @@ public class HomeActivity extends Activity
 
         return new File(cachePath + File.separator + uniqueName);
     }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if(BuildConfig.DEBUG)
+        {
+            Log.i("HomeActivity", "Reached onActivityResult()");
+        }
+        
+        if(requestCode == Tags.POST_REQUEST_CODE)
+        {
+            if(resultCode == Tags.RESULT_OK)
+            {
+                int position = data.getIntExtra("position", -1);
+                int goatVal = data.getIntExtra("goatVal", 0);
+                
+                if(BuildConfig.DEBUG)
+                {
+                    Log.i("HomeActivity", "Request and result code worked\nPosition: " + position + "\n"
+                            +"goatVal: " + goatVal);
+                }
+                
+                if(position != -1)
+                {
+                    RetainFragment retainFragment = RetainFragment
+                            .findOrCreateRetainFragment(getFragmentManager());
+                    
+                    Post post = (Post) retainFragment.retainedAdapter.getItem(position);
+                    if(goatVal == 1)
+                    {
+                        post.addUpvote();
+                    }
+                    else if(goatVal == -1)
+                    {
+                        post.addDownvote();
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -237,5 +291,4 @@ public class HomeActivity extends Activity
             retainFragment.retainedDiskCache = diskLruCache;
         }
     }
-
 }

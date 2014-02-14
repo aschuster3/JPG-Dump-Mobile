@@ -50,11 +50,26 @@ public class SubmitVote extends AsyncTask<Void, Void, Integer>
                 
                 int newGoats = Integer.parseInt(num);
                 if(isUp)
-                    { newGoats++;}
+                {   
+                    newGoats++;
+                    activity.getIntent().putExtra("goatVal", 1);
+                }
                 else
-                    { newGoats--;}
+                { 
+                    newGoats--;
+                    activity.getIntent().putExtra("goatVal", -1);
+                }
                 
                 goatCount.setText("" + newGoats);
+                
+                if(newGoats < 0) 
+                    { goatCount.setTextColor(0xFFFF0013);}
+                else if(newGoats > 0) 
+                    { goatCount.setTextColor(0xFF00FF00);}
+                else 
+                    { goatCount.setTextColor(0xFF808080);}
+                
+                
                 break;
             case 401:
                 Toast.makeText(activity, res.getString(R.string.code401), Toast.LENGTH_SHORT).show();
@@ -63,7 +78,7 @@ public class SubmitVote extends AsyncTask<Void, Void, Integer>
                 Toast.makeText(activity, res.getString(R.string.code403), Toast.LENGTH_SHORT).show();
                 break;
             default:
-                Toast.makeText(activity, res.getString(R.string.codeWTF) + " code: " + responseCode, Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, res.getString(R.string.codeWTF), Toast.LENGTH_SHORT).show();
                 break;
         }
     }
