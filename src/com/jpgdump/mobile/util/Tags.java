@@ -11,6 +11,9 @@ public class Tags
     
     /*String Keys*/
     public static final String LOADING_BITMAP = "rawr";
+    public static final String SESSION_INFO = "sesh";
+    public static final String SESSION_KEY = "sesh_key";
+    public static final String SESSION_ID = "sesh_id";
     
     /*Tags*/
     public static final String RETAIN_FRAG = "RetainFragment";

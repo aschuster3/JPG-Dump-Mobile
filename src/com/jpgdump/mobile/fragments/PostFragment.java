@@ -53,7 +53,7 @@ public class PostFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.post_fragment_layout, container,
+        View view = inflater.inflate(R.layout.activity_full_picture_view, container,
                 false);
         return view;
     }

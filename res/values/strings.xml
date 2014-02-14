@@ -9,5 +9,11 @@
     <string name="no_internet_dialog_message">This device currently lacks an internet connection.  Please connect and try again.</string>
     <string name="no_internet_dialog_positive">Retry</string>
     <string name="no_internet_dialog_negative">Cancel</string>
+    <string name="weak">Weak</string>
+    <string name="peak">Peak</string>
+    <string name="code200">Vote submitted</string>
+    <string name="code401">There\'s something wrong with your session</string>
+    <string name="code403">You can\'t vote more than once</string>
+    <string name="codeWTF">I have no idea what the hell you did</string>
 
 </resources>

@@ -2,6 +2,7 @@ package com.jpgdump.mobile;
 
 import java.io.File;
 
+import com.jpgdump.mobile.async.CreateSession;
 import com.jpgdump.mobile.async.FetchPosts;
 import com.jpgdump.mobile.fragments.RetainFragment;
 import com.jpgdump.mobile.listeners.GridPressListener;
@@ -17,6 +18,7 @@ import android.os.Environment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.LruCache;
@@ -40,8 +42,23 @@ public class HomeActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        
         pictureGrid = (GridView) findViewById(R.id.picture_viewer_activity_home);
-
+        
+        //Retrieve Session Id or, if it doesn't exist, create it
+        SharedPreferences sessionInfo = getSharedPreferences(Tags.SESSION_INFO, 0);
+        String sessionId = sessionInfo.getString(Tags.SESSION_ID, "");
+        if(sessionId.equals(""))
+        {
+            new CreateSession(this).execute();
+        }
+        
+        if(BuildConfig.DEBUG)
+        {
+            Log.i("CreateSession", "###New Session Created###\nSession ID: " + sessionInfo.getString(Tags.SESSION_ID, "") + "\n"
+                    + "Session Key: " + sessionInfo.getString(Tags.SESSION_KEY, ""));
+        }
+        
         OnItemClickListener gridPress = new GridPressListener(this);
         pictureGrid.setOnItemClickListener(gridPress);
 

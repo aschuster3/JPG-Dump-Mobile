@@ -25,6 +25,10 @@ public class GridPressListener implements OnItemClickListener
         Post post = (Post) grid.getAdapter().getItem(position);
         
         intent.putExtra("url", post.getUrl());
+        intent.putExtra("postId", post.getId());
+        intent.putExtra("upvotes", post.getUpvotes());
+        intent.putExtra("downvotes", post.getDownvotes());
+        intent.putExtra("title", post.getTitle());
         
         activity.startActivity(intent);
     }
