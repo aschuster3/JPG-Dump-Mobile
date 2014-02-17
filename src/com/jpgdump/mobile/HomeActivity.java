@@ -6,6 +6,7 @@ import com.jpgdump.mobile.async.CreateSession;
 import com.jpgdump.mobile.async.FetchPosts;
 import com.jpgdump.mobile.fragments.RetainFragment;
 import com.jpgdump.mobile.listeners.GridPressListener;
+import com.jpgdump.mobile.listeners.NoInternetDialogListener;
 import com.jpgdump.mobile.listeners.PageBottomListener;
 import com.jpgdump.mobile.objects.Post;
 import com.jpgdump.mobile.util.DiskLruImageCache;
@@ -25,6 +26,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
@@ -45,79 +47,84 @@ public class HomeActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         
-        pictureGrid = (GridView) findViewById(R.id.picture_viewer_activity_home);
-        
-        //Retrieve Session Id or, if it doesn't exist, create it
-        SharedPreferences sessionInfo = getSharedPreferences(Tags.SESSION_INFO, 0);
-        String sessionId = sessionInfo.getString(Tags.SESSION_ID, "");
-        if(sessionId.equals(""))
+        if(isOnline())
         {
-            new CreateSession(this).execute();
-        }
-        
-        if(BuildConfig.DEBUG)
-        {
-            Log.i("CreateSession", "###New Session Created###\nSession ID: " + sessionInfo.getString(Tags.SESSION_ID, "") + "\n"
-                    + "Session Key: " + sessionInfo.getString(Tags.SESSION_KEY, ""));
-        }
-        
-        OnItemClickListener gridPress = new GridPressListener(this);
-        pictureGrid.setOnItemClickListener(gridPress);
-
-        // Instantiate the memory cache, used to later hold bitmaps retrieved
-        // from JPG Dump
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-
-        final int cacheSize = maxMemory / 4;
-
-        // A handler for when the orientation changes
-        RetainFragment retainFragment = RetainFragment
-                .findOrCreateRetainFragment(getFragmentManager());
-
-        memoryCache = retainFragment.retainedCache;
-        diskLruCache = retainFragment.retainedDiskCache;
-        adapter = retainFragment.retainedAdapter;
-        if (memoryCache == null)
-        {
-            // Initialize disk cache on background thread
-            new InitDiskCacheTask(retainFragment).execute();
-
-            // Initialize mem cache
-            memoryCache = new LruCache<String, Bitmap>(cacheSize)
+            boolean shouldReset = getIntent().getBooleanExtra("reset", false);
+            
+            pictureGrid = (GridView) findViewById(R.id.picture_viewer_activity_home);
+            
+            //Retrieve Session Id or, if it doesn't exist, create it
+            SharedPreferences sessionInfo = getSharedPreferences(Tags.SESSION_INFO, 0);
+            String sessionId = sessionInfo.getString(Tags.SESSION_ID, "");
+            if(sessionId.equals(""))
             {
-                @Override
-                protected int sizeOf(String key, Bitmap bitmap)
+                new CreateSession(this).execute();
+            }
+            
+            if(BuildConfig.DEBUG)
+            {
+                Log.i("CreateSession", "###New Session Created###\nSession ID: " + sessionInfo.getString(Tags.SESSION_ID, "") + "\n"
+                        + "Session Key: " + sessionInfo.getString(Tags.SESSION_KEY, ""));
+            }
+            
+            OnItemClickListener gridPress = new GridPressListener(this);
+            pictureGrid.setOnItemClickListener(gridPress);
+    
+            /* 
+             * Instantiate the memory cache, used to later hold bitmaps retrieved
+             * from JPG Dump
+             */
+            final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+            final int cacheSize = maxMemory / 4;
+    
+            // A handler for when the orientation changes
+            RetainFragment retainFragment = RetainFragment
+                    .findOrCreateRetainFragment(getFragmentManager());
+    
+            memoryCache = retainFragment.retainedCache;
+            diskLruCache = retainFragment.retainedDiskCache;
+            adapter = retainFragment.retainedAdapter;
+            if (memoryCache == null || shouldReset)
+            {
+                getIntent().putExtra("reset", false);
+                
+                // Initialize disk cache on background thread
+                new InitDiskCacheTask(retainFragment).execute();
+    
+                // Initialize mem cache
+                memoryCache = new LruCache<String, Bitmap>(cacheSize)
                 {
-                    return bitmap.getByteCount() / 1024;
-                }
-            };
-
-            retainFragment.retainedCache = memoryCache;
-
-            Integer[] postParams = { Tags.START_POSTS , 0 };
-
-            if (isOnline())
-            {
+                    @Override
+                    protected int sizeOf(String key, Bitmap bitmap)
+                    {
+                        return bitmap.getByteCount() / 1024;
+                    }
+                };
+    
+                retainFragment.retainedCache = memoryCache;
+    
+                Integer[] postParams = { Tags.START_POSTS , 0 };
+    
                 new FetchPosts(this, retainFragment).execute(postParams);
             }
             else
             {
-                // Handle not being connected
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.no_internet_dialog_title);
-                builder.setMessage(R.string.no_internet_dialog_message);
-                builder.setPositiveButton(R.string.no_internet_dialog_positive,
-                        null);
-                builder.setNegativeButton(R.string.no_internet_dialog_negative,
-                        null);
+                OnScrollListener scrollListener = new PageBottomListener(this,
+                        retainFragment);
+                pictureGrid.setAdapter(adapter);
+                pictureGrid.setOnScrollListener(scrollListener);
             }
         }
         else
         {
-            OnScrollListener scrollListener = new PageBottomListener(this,
-                    retainFragment);
-            pictureGrid.setAdapter(adapter);
-            pictureGrid.setOnScrollListener(scrollListener);
+            // Handle not being connected
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.no_internet_dialog_title)
+                   .setMessage(R.string.no_internet_dialog_message)
+                   .setNegativeButton(R.string.no_internet_dialog_positive,
+                    new NoInternetDialogListener(this))
+                   .create()
+                   .show();
         }
     }
     
@@ -194,6 +201,9 @@ public class HomeActivity extends Activity
         return diskLruCache.containsKey(key);
     }
     
+    /*
+     * Checks connection to the internet
+     */
     public boolean isOnline()
     {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -202,13 +212,16 @@ public class HomeActivity extends Activity
         return (netInfo != null && netInfo.isConnectedOrConnecting());
     }
 
-    // Creates a unique subdirectory of the designated app cache directory.
-    // Tries to use external but if not mounted, falls back on internal storage.
+    /* 
+     * Creates a unique subdirectory of the designated app cache directory.
+     * Tries to use external but if not mounted, falls back on internal storage.
+     */
     public static File getDiskCacheDir(Context context, String uniqueName)
     {
-        // Check if media is mounted or storage is built-in, if so, try and use
-        // external cache dir otherwise use internal cache dir
-
+        /*
+         *  Check if media is mounted or storage is built-in, if so, try and use
+         *  external cache dir otherwise use internal cache dir
+         */
         final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment
                 .getExternalStorageState())
                 || !Environment.isExternalStorageRemovable() ? context
@@ -244,14 +257,27 @@ public class HomeActivity extends Activity
                     RetainFragment retainFragment = RetainFragment
                             .findOrCreateRetainFragment(getFragmentManager());
                     
-                    Post post = (Post) retainFragment.retainedAdapter.getItem(position);
-                    if(goatVal == 1)
+                    /*
+                     * This checks to see if memory has been cleared since the app was 
+                     * first opened.  If the retainedAdapter doesn't exist, the home
+                     * screen will refresh.
+                     */
+                    if(retainFragment.retainedAdapter != null)
                     {
-                        post.addUpvote();
+                        Post post = (Post) retainFragment.retainedAdapter.getItem(position);
+                        if(goatVal == 1)
+                        {
+                            post.addUpvote();
+                        }
+                        else if(goatVal == -1)
+                        {
+                            post.addDownvote();
+                        }
                     }
-                    else if(goatVal == -1)
+                    else
                     {
-                        post.addDownvote();
+                        getIntent().putExtra("reset", true);
+                        this.recreate();
                     }
                 }
             }
@@ -266,6 +292,40 @@ public class HomeActivity extends Activity
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        /*
+         * refresh: Refreshes the page and retrieves new posts if
+         *      they exist
+         * 
+         * action_settings: Will lead to the settings page for the
+         *      application
+         */
+        switch (item.getItemId())
+        {
+            case R.id.refresh:
+                getIntent().putExtra("reset", true);
+                this.recreate();
+                return true;
+            case R.id.action_settings:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.settings_dialog_title)
+                       .setMessage(R.string.settings_dialog_message)
+                       .setNeutralButton(R.string.okay_button, null)
+                       .create()
+                       .show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /*
+     * Initializes the DiskLruCache so that it may be used to hold images.
+     * This segement is also synchronized so as to avoid accessing it before
+     * it has been initialized.
+     */
     class InitDiskCacheTask extends AsyncTask<Void, Void, Void>
     {
         RetainFragment retainFragment;

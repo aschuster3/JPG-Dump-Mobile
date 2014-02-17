@@ -99,7 +99,7 @@ public class GridDisplayAdapter extends BaseAdapter
             {
                 //Set the loading image and then begin loading
                 
-                holder.thumbnail.setImageResource(R.drawable.no_image_classifier);
+                holder.thumbnail.setImageResource(R.drawable.image_loading);
             }
             else
             {

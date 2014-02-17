@@ -15,5 +15,11 @@
     <string name="code401">There\'s something wrong with your session</string>
     <string name="code403">You can\'t vote more than once</string>
     <string name="codeWTF">I have no idea what the hell you did</string>
+    <string name="picture_info">Picture Properties</string>
+    <string name="refresh">Refresh</string>
+    <string name="settings_dialog_title">So about those settings</string>
+    <string name="settings_dialog_message">Hey, so, there aren\'t any settings, yet.  If there\'s a particular setting you\'d like to see, email me at rfserverstudios@gmail.com and I\'ll see what I can do!</string>
+    <string name="okay_button">Okay</string>
+    <string name="picture_information">Properties</string>
 
 </resources>
