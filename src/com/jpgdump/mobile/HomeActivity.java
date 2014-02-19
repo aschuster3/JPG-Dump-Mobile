@@ -17,6 +17,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -54,8 +55,8 @@ public class HomeActivity extends Activity
             pictureGrid = (GridView) findViewById(R.id.picture_viewer_activity_home);
             
             //Retrieve Session Id or, if it doesn't exist, create it
-            SharedPreferences sessionInfo = getSharedPreferences(Tags.SESSION_INFO, 0);
-            String sessionId = sessionInfo.getString(Tags.SESSION_ID, "");
+            SharedPreferences prefs = getSharedPreferences(Tags.SESSION_INFO, 0);
+            String sessionId = prefs.getString(Tags.SESSION_ID, "");
             if(sessionId.equals(""))
             {
                 new CreateSession(this).execute();
@@ -63,9 +64,15 @@ public class HomeActivity extends Activity
             
             if(BuildConfig.DEBUG)
             {
-                Log.i("CreateSession", "###New Session Created###\nSession ID: " + sessionInfo.getString(Tags.SESSION_ID, "") + "\n"
-                        + "Session Key: " + sessionInfo.getString(Tags.SESSION_KEY, ""));
+                Log.i("CreateSession", "###New Session Created###\nSession ID: " + prefs.getString(Tags.SESSION_ID, "") + "\n"
+                        + "Session Key: " + prefs.getString(Tags.SESSION_KEY, ""));
             }
+            
+            //Retrieve settings information
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+            
+            boolean sfw = settings.getBoolean(Tags.SFW, true);
+            
             
             OnItemClickListener gridPress = new GridPressListener(this);
             pictureGrid.setOnItemClickListener(gridPress);
@@ -102,8 +109,18 @@ public class HomeActivity extends Activity
                 };
     
                 retainFragment.retainedCache = memoryCache;
-    
-                Integer[] postParams = { Tags.START_POSTS , 0 };
+                
+                Integer[] postParams = new Integer[3];
+                postParams[0] = Tags.START_POSTS;
+                postParams[1] = 0;
+                if(sfw)
+                {
+                    postParams[2] = 0;
+                }
+                else
+                {
+                    postParams[2] = 1;
+                }
     
                 new FetchPosts(this, retainFragment).execute(postParams);
             }
@@ -183,7 +200,8 @@ public class HomeActivity extends Activity
                     diskCacheLock.wait();
                 }
                 catch (InterruptedException e)
-                {
+                {   
+                    e.printStackTrace();
                 }
             }
             if (diskLruCache != null)
@@ -282,6 +300,14 @@ public class HomeActivity extends Activity
                 }
             }
         }
+        else if(requestCode == Tags.SETTINGS_REQUEST_CODE)
+        {
+            if(resultCode == Tags.RESULT_CHANGE_MADE)
+            {
+                getIntent().putExtra("reset", true);
+                this.recreate();
+            }
+        }
     }
 
     @Override
@@ -304,18 +330,19 @@ public class HomeActivity extends Activity
          */
         switch (item.getItemId())
         {
+            //Refresh the page
             case R.id.refresh:
                 getIntent().putExtra("reset", true);
                 this.recreate();
                 return true;
+                
+            //Open the settings menu
             case R.id.action_settings:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.settings_dialog_title)
-                       .setMessage(R.string.settings_dialog_message)
-                       .setNeutralButton(R.string.okay_button, null)
-                       .create()
-                       .show();
+                Intent intent = new Intent(this, PreferencesActivity.class);
+                startActivityForResult(intent, Tags.SETTINGS_REQUEST_CODE);
                 return true;
+                
+            //Do default action
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -7,6 +7,8 @@ import com.jpgdump.mobile.async.LoadPicture;
 import com.jpgdump.mobile.fragments.RetainFragment;
 import com.jpgdump.mobile.util.Tags;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -50,7 +52,20 @@ public class PageBottomListener implements OnScrollListener
     {   
         if (LoadPicture.allowDownload() && FetchPosts.allowDownload())
         {
-            Integer[] postParams = { Tags.ADD_POSTS, retainFragment.retainedAdapter.getCount() };
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(activity);
+            
+            //Check to see if the filter is needed
+            int sfwFilter;
+            if(settings.getBoolean(Tags.SFW, true))
+            {
+                sfwFilter = 0;
+            }
+            else
+            {
+                sfwFilter = 1;
+            }
+            
+            Integer[] postParams = { Tags.ADD_POSTS, retainFragment.retainedAdapter.getCount(), sfwFilter };
             new FetchPosts(activity, retainFragment).execute(postParams);
         }
     }

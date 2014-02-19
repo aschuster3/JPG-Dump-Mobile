@@ -44,11 +44,20 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
         /*
          * postParams[0]: holds the number of posts being queried
          * postParams[1]: holds the current number of posts
+         * postParams[2]: holds a filter (if it exists)
          */
         
         PostsInterface posts = new PostManager();
         
-        return posts.retrievePosts(postParams[0], postParams[1], "-id", "");
+        //By default, no filter, but check if sfw is enabled
+        String filter = "";
+        
+        if(postParams[2] == 1)
+        {
+            filter = "[[\"safety==0\"]]";
+        }
+        
+        return posts.retrievePosts(postParams[0], postParams[1], "-id", filter);
     }
     
     @Override
