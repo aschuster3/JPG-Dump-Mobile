@@ -1,6 +1,11 @@
 package com.jpgdump.mobile.async;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.GridView;
 
 import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.HomeActivity;
@@ -12,12 +17,7 @@ import com.jpgdump.mobile.interfaces.PostsInterface;
 import com.jpgdump.mobile.listeners.PageBottomListener;
 import com.jpgdump.mobile.objects.Post;
 
-import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.GridView;
-
-public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
+public final class FetchPosts extends AsyncTask<Integer, Void, List<Post>>
 {
     private static final String TAG = "FetchPosts";
     
@@ -39,7 +39,7 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
     }
     
     @Override
-    protected ArrayList<Post> doInBackground(Integer... postParams)
+    protected List<Post> doInBackground(Integer... postParams)
     {
         /*
          * postParams[0]: holds the number of posts being queried
@@ -61,7 +61,7 @@ public class FetchPosts extends AsyncTask<Integer, Void, ArrayList<Post>>
     }
     
     @Override
-    protected void onPostExecute(ArrayList<Post> posts)
+    protected void onPostExecute(List<Post> posts)
     {
         if(BuildConfig.DEBUG)
         {
