@@ -55,17 +55,17 @@ public class PageBottomListener implements OnScrollListener
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(activity);
             
             //Check to see if the filter is needed
-            int sfwFilter;
-            if(settings.getBoolean(Tags.SFW, true))
+            String sfwFilter;
+            if(settings.getBoolean(Tags.SFW, false))
             {
-                sfwFilter = 0;
+                sfwFilter = "";
             }
             else
             {
-                sfwFilter = 1;
+                sfwFilter = "[[\"safety==0\"]]";
             }
             
-            Integer[] postParams = { Tags.ADD_POSTS, retainFragment.retainedAdapter.getCount(), sfwFilter };
+            String[] postParams = { Tags.ADD_POSTS, "" + retainFragment.retainedAdapter.getCount(), sfwFilter };
             new FetchPosts(activity, retainFragment).execute(postParams);
         }
     }

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.VotingInterface;
+import com.jpgdump.mobile.util.Tags;
 
 public class VoteManager implements VotingInterface
 {
@@ -29,7 +30,7 @@ public class VoteManager implements VotingInterface
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
             
             String params = "postId=" + postId + "&value=" + voteType.getValue();
-
+            
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(params);
@@ -45,7 +46,7 @@ public class VoteManager implements VotingInterface
             
             if(BuildConfig.DEBUG)
             {
-                Log.i("VoteManager", e.getMessage());
+                Log.i(Tags.VOTE_MANAGER, e.getMessage());
             }
         }
         return responseCode;

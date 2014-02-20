@@ -25,7 +25,7 @@ public class PostManager implements PostsInterface
     private static final String TAG = "PostManager";
     
     @Override
-    public ArrayList<Post> retrievePosts(int maxResults, int startIndex,
+    public ArrayList<Post> retrievePosts(String maxResults, String startIndex,
             String sortBy, String filters)
     {
         String postUrl = "http://jpgdump.com/api/v1/posts?startIndex=" + 

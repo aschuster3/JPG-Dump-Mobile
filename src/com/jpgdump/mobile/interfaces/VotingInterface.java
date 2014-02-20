@@ -4,7 +4,7 @@ public interface VotingInterface
 {
     public static enum VoteType {
         UP(1),
-        DOWN(2);
+        DOWN(-1);
         
         private final int value;
         

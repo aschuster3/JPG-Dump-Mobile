@@ -17,7 +17,7 @@ import com.jpgdump.mobile.interfaces.PostsInterface;
 import com.jpgdump.mobile.listeners.PageBottomListener;
 import com.jpgdump.mobile.objects.Post;
 
-public final class FetchPosts extends AsyncTask<Integer, Void, List<Post>>
+public final class FetchPosts extends AsyncTask<String, Void, List<Post>>
 {
     private static final String TAG = "FetchPosts";
     
@@ -39,7 +39,7 @@ public final class FetchPosts extends AsyncTask<Integer, Void, List<Post>>
     }
     
     @Override
-    protected List<Post> doInBackground(Integer... postParams)
+    protected List<Post> doInBackground(String... postParams)
     {
         /*
          * postParams[0]: holds the number of posts being queried
@@ -49,15 +49,7 @@ public final class FetchPosts extends AsyncTask<Integer, Void, List<Post>>
         
         PostsInterface posts = new PostManager();
         
-        //By default, no filter, but check if sfw is enabled
-        String filter = "";
-        
-        if(postParams[2] == 1)
-        {
-            filter = "[[\"safety==0\"]]";
-        }
-        
-        return posts.retrievePosts(postParams[0], postParams[1], "-id", filter);
+        return posts.retrievePosts(postParams[0], postParams[1], "-id", postParams[2]);
     }
     
     @Override

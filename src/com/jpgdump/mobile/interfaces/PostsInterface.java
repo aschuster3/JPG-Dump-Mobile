@@ -18,6 +18,6 @@ public interface PostsInterface
      * @return Returns the fully processed posts, ready to be
      * acted upon.
      */
-    public ArrayList<Post> retrievePosts(int maxResults, int startIndex, 
+    public ArrayList<Post> retrievePosts(String maxResults, String startIndex, 
             String sortBy, String filters);
 }

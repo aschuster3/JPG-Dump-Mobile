@@ -48,8 +48,8 @@ public class FullPictureViewActivity extends FragmentActivity
         setGoatAmount(goatTotal);
 
         // Get the buttons and put necessary listeners
-        upGoatButton = (Button) findViewById(R.id.weak_button);
-        downGoatButton = (Button) findViewById(R.id.peak_button);
+        upGoatButton = (Button) findViewById(R.id.peak_button);
+        downGoatButton = (Button) findViewById(R.id.weak_button);
 
         upGoatButton.setOnClickListener(
             new GoatPressListener(this, postId, VoteType.UP, goatCount));

@@ -71,7 +71,7 @@ public class HomeActivity extends Activity
             //Retrieve settings information
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
             
-            boolean sfw = settings.getBoolean(Tags.SFW, true);
+            boolean sfw = settings.getBoolean(Tags.SFW, false);
             
             
             OnItemClickListener gridPress = new GridPressListener(this);
@@ -110,16 +110,16 @@ public class HomeActivity extends Activity
     
                 retainFragment.retainedCache = memoryCache;
                 
-                Integer[] postParams = new Integer[3];
+                String[] postParams = new String[3];
                 postParams[0] = Tags.START_POSTS;
-                postParams[1] = 0;
+                postParams[1] = "0";
                 if(sfw)
                 {
-                    postParams[2] = 0;
+                    postParams[2] = "";
                 }
                 else
                 {
-                    postParams[2] = 1;
+                    postParams[2] = "[[\"safety==0\"]]";
                 }
     
                 new FetchPosts(this, retainFragment).execute(postParams);
