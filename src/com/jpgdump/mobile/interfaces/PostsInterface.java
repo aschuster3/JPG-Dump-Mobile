@@ -7,7 +7,6 @@ import com.jpgdump.mobile.objects.Post;
 public interface PostsInterface
 {
     /**
-     * 
      * @param maxResults Maximum number of posts to retrieve
      * @param startIndex Retrieve starting from this index
      * @param sortBy Orders the posts based on a sort criteria.

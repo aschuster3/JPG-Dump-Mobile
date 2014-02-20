@@ -10,8 +10,7 @@ import android.os.Bundle;
 import android.util.LruCache;
 import android.widget.BaseAdapter;
 
-
-/*
+/**
  * The purpose of this Fragment is to persist data
  * across orientation changes.  It does not directly
  * display views.

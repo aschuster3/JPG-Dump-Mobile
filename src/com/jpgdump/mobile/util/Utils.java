@@ -6,13 +6,13 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 
-public class Utils
+public final class Utils
 {
-    public static final int IO_BUFFER_SIZE = 8 * 1024;
+    public static final int IO_BUFFER_SIZE_BYTES = 8 * 1024;
 
     private Utils()
     {
-    };
+    }
 
     public static boolean isExternalStorageRemovable()
     {

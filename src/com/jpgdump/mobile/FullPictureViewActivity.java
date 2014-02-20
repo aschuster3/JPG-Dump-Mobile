@@ -1,5 +1,6 @@
 package com.jpgdump.mobile;
 
+import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 import com.jpgdump.mobile.listeners.GoatPressListener;
 import com.jpgdump.mobile.util.Tags;
 
@@ -50,10 +51,10 @@ public class FullPictureViewActivity extends FragmentActivity
         upGoatButton = (Button) findViewById(R.id.weak_button);
         downGoatButton = (Button) findViewById(R.id.peak_button);
 
-        upGoatButton.setOnClickListener(new GoatPressListener(this, postId,
-                false, goatCount));
-        downGoatButton.setOnClickListener(new GoatPressListener(this, postId,
-                true, goatCount));
+        upGoatButton.setOnClickListener(
+            new GoatPressListener(this, postId, VoteType.UP, goatCount));
+        downGoatButton.setOnClickListener(
+            new GoatPressListener(this, postId, VoteType.DOWN, goatCount));
 
         // Put the title of the post at the top (if it exists)
         title = (TextView) findViewById(R.id.picture_title);

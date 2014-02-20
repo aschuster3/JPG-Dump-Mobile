@@ -55,7 +55,7 @@ public class DiskLruImageCache
         try
         {
             out = new BufferedOutputStream(editor.newOutputStream(0),
-                    Utils.IO_BUFFER_SIZE);
+                    Utils.IO_BUFFER_SIZE_BYTES);
             return bitmap.compress(mCompressFormat, mCompressQuality, out);
         }
         finally
@@ -150,7 +150,7 @@ public class DiskLruImageCache
             if (in != null)
             {
                 final BufferedInputStream buffIn = new BufferedInputStream(in,
-                        Utils.IO_BUFFER_SIZE);
+                        Utils.IO_BUFFER_SIZE_BYTES);
                 bitmap = BitmapFactory.decodeStream(buffIn);
             }
         }
