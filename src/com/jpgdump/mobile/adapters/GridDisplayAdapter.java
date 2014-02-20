@@ -1,10 +1,6 @@
 package com.jpgdump.mobile.adapters;
 
-import java.util.ArrayList;
-
-import com.jpgdump.mobile.HomeActivity;
-import com.jpgdump.mobile.R;
-import com.jpgdump.mobile.objects.Post;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,22 +11,26 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jpgdump.mobile.HomeActivity;
+import com.jpgdump.mobile.R;
+import com.jpgdump.mobile.objects.Post;
+
 public class GridDisplayAdapter extends BaseAdapter
 {
     Context context;
-    ArrayList<Post> posts;
+    List<Post> posts;
     int layout;
     
     public static final boolean DEBUG = false;
     
-    public GridDisplayAdapter(Context context, ArrayList<Post> posts)
+    public GridDisplayAdapter(Context context, List<Post> posts)
     {
         this.context = context;
         this.posts = posts;
         this.layout = R.layout.grid_display_panel;
     }
     
-    public void addItems(ArrayList<Post> newPosts)
+    public void addItems(List<Post> newPosts)
     {
         posts.addAll(newPosts);
     }

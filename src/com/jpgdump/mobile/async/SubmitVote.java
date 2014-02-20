@@ -3,6 +3,7 @@ package com.jpgdump.mobile.async;
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.implementation.VoteManager;
 import com.jpgdump.mobile.interfaces.VotingInterface;
+import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -10,22 +11,22 @@ import android.os.AsyncTask;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SubmitVote extends AsyncTask<Void, Void, Integer>
+public final class SubmitVote extends AsyncTask<Void, Void, Integer>
 {
-    Activity activity;
-    String sessionId, sessionKey, postId;
-    boolean isUp;
-    TextView goatCount;
+    private final Activity activity;
+    private final String sessionId, sessionKey, postId;
+    private final VoteType voteType;
+    private final TextView goatCount;
     
     public SubmitVote(Activity activity, String sessionId, 
-            String sessionKey, String postId, boolean isUp,
+            String sessionKey, String postId, VoteType voteType,
             TextView goatCount)
     {
         this.activity = activity;
         this.sessionId = sessionId;
         this.sessionKey = sessionKey;
         this.postId = postId;
-        this.isUp = isUp;
+        this.voteType = voteType;
         this.goatCount = goatCount;
     }
     
@@ -33,8 +34,7 @@ public class SubmitVote extends AsyncTask<Void, Void, Integer>
     protected Integer doInBackground(Void... params)
     {
         VotingInterface voter = new VoteManager();
-        
-        return voter.distributeGoat(sessionId, sessionKey, postId, isUp);
+        return voter.distributeGoat(sessionId, sessionKey, postId, voteType);
     }
     
     @Override
@@ -49,27 +49,16 @@ public class SubmitVote extends AsyncTask<Void, Void, Integer>
                 String num = (String) goatCount.getText();
                 
                 int newGoats = Integer.parseInt(num);
-                if(isUp)
-                {   
-                    newGoats++;
-                    activity.getIntent().putExtra("goatVal", 1);
-                }
-                else
-                { 
-                    newGoats--;
-                    activity.getIntent().putExtra("goatVal", -1);
-                }
-                
+                newGoats += voteType.getValue();
+                activity.getIntent().putExtra("goatVal", voteType.getValue());
                 goatCount.setText("" + newGoats);
                 
-                if(newGoats < 0) 
+                if(newGoats < 0)
                     { goatCount.setTextColor(0xFFFF0013);}
                 else if(newGoats > 0) 
                     { goatCount.setTextColor(0xFF00FF00);}
                 else 
                     { goatCount.setTextColor(0xFF808080);}
-                
-                
                 break;
             case 401:
                 Toast.makeText(activity, res.getString(R.string.code401), Toast.LENGTH_SHORT).show();

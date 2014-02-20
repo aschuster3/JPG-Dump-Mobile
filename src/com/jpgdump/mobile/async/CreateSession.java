@@ -20,8 +20,7 @@ import android.util.Log;
 public class CreateSession extends AsyncTask<Void, Void, Session>
 {
     private static final String URL = "http://jpgdump.com/api/v1/sessions";
-    
-    Activity activity;
+    private final Activity activity;
     
     public CreateSession(Activity activity)
     {
@@ -49,7 +48,7 @@ public class CreateSession extends AsyncTask<Void, Void, Session>
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     con.getInputStream()));
             String inputLine;
-            StringBuffer response = new StringBuffer();
+            StringBuilder response = new StringBuilder();
 
             while ((inputLine = in.readLine()) != null)
             {

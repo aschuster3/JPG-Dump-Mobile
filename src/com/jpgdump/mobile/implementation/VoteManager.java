@@ -1,13 +1,13 @@
 package com.jpgdump.mobile.implementation;
 
+import java.io.DataOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import android.util.Log;
 
 import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.VotingInterface;
-
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class VoteManager implements VotingInterface
 {
@@ -15,14 +15,9 @@ public class VoteManager implements VotingInterface
     
     @Override
     public int distributeGoat(String sessionId, String sessionKey, 
-            String postId, boolean isUp)
+            String postId, VoteType voteType)
     {
         int responseCode = 1337;
-        
-        int value;
-        if(isUp) { value = 1;}
-        else { value = -1;}
-        
         try
         {
             URL obj = new URL(URL);
@@ -33,7 +28,7 @@ public class VoteManager implements VotingInterface
             con.setRequestProperty("X-Jpgdump-Session-Id", sessionId);
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
             
-            String params = "postId=" + postId + "&value=" + value;
+            String params = "postId=" + postId + "&value=" + voteType.getValue();
 
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
