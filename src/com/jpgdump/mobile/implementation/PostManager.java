@@ -14,15 +14,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
-import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.PostsInterface;
 import com.jpgdump.mobile.objects.Post;
+import com.jpgdump.mobile.util.ContextLogger;
 
 public class PostManager implements PostsInterface
 {
-    private static final String TAG = "PostManager";
+    private final ContextLogger log = ContextLogger.getLogger(this);
     
     @Override
     public ArrayList<Post> retrievePosts(String maxResults, String startIndex,
@@ -86,29 +84,19 @@ public class PostManager implements PostsInterface
         }
         catch (MalformedURLException e)
         {
-            if(BuildConfig.DEBUG)
-            {
-                Log.e(TAG, "The URL is misformed");
-            }
-            e.printStackTrace();
+            // Intentionally ignore error.
+            log.e("The URL is misformed", e);
         }
         catch (IOException e)
         {
-            if(BuildConfig.DEBUG)
-            {
-                Log.e(TAG, "There's a problem with the BufferedReader");
-            }
-            e.printStackTrace();
+            // Intentionally ignore error.
+            log.e("There's a problem with the BufferedReader", e);
         }
         catch (JSONException e)
         {
-            if(BuildConfig.DEBUG)
-            {
-                Log.e(TAG, "The JSON has returned something unexpected");
-            }
-            e.printStackTrace();
+            // Intentionally ignore error.
+            log.e("The JSON has returned something unexpected", e);
         }
         return posts;
     }
-
 }

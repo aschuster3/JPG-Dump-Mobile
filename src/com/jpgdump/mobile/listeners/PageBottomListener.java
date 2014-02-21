@@ -1,21 +1,21 @@
 package com.jpgdump.mobile.listeners;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+
 import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.HomeActivity;
 import com.jpgdump.mobile.async.FetchPosts;
 import com.jpgdump.mobile.async.LoadPicture;
 import com.jpgdump.mobile.fragments.RetainFragment;
+import com.jpgdump.mobile.util.ContextFormattingLogger;
 import com.jpgdump.mobile.util.Tags;
-
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 
 public class PageBottomListener implements OnScrollListener
 {
-    private static final String TAG = "PageBottomListener";
+    private final ContextFormattingLogger log = ContextFormattingLogger.getLogger(this);
 
     private HomeActivity activity;
     private RetainFragment retainFragment;
@@ -32,8 +32,7 @@ public class PageBottomListener implements OnScrollListener
     {
         if(BuildConfig.DEBUG)
         {
-            Log.i(TAG, "Number of non-completed threads: "
-                    + LoadPicture.getNumThreads());
+            log.i("Number of non-completed threads: %d", LoadPicture.getNumThreads());
         }
         
         boolean loadMore = 4 +

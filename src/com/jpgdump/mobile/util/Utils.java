@@ -3,43 +3,27 @@ package com.jpgdump.mobile.util;
 import java.io.File;
 
 import android.content.Context;
-import android.os.Build;
-import android.os.Environment;
 
 public final class Utils
 {
     public static final int IO_BUFFER_SIZE_BYTES = 8 * 1024;
+    private static final ContextFormattingLogger log = ContextFormattingLogger.getLogger(Utils.class);
 
     private Utils()
     {
     }
-
-    public static boolean isExternalStorageRemovable()
+    
+    public static File getCacheDir(Context context)
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+        File cacheDirectory = context.getExternalCacheDir();
+        if (cacheDirectory != null)
         {
-            return Environment.isExternalStorageRemovable();
+            return cacheDirectory;
         }
-        return true;
+        // Typically happens when the external directory isn't mounted.
+        cacheDirectory = context.getCacheDir();
+        log.i("Unable to find external cache directory, using %s", 
+            cacheDirectory.getPath());
+        return cacheDirectory;
     }
-
-    public static File getExternalCacheDir(Context context)
-    {
-        if (hasExternalCacheDir())
-        {
-            return context.getExternalCacheDir();
-        }
-
-        // Before Froyo we need to construct the external cache dir ourselves
-        final String cacheDir = "/Android/data/" + context.getPackageName()
-                + "/cache/";
-        return new File(Environment.getExternalStorageDirectory().getPath()
-                + cacheDir);
-    }
-
-    public static boolean hasExternalCacheDir()
-    {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
-    }
-
 }

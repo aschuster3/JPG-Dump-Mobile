@@ -3,7 +3,6 @@ package com.jpgdump.mobile.async;
 import java.util.List;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.GridView;
 
@@ -16,10 +15,11 @@ import com.jpgdump.mobile.implementation.PostManager;
 import com.jpgdump.mobile.interfaces.PostsInterface;
 import com.jpgdump.mobile.listeners.PageBottomListener;
 import com.jpgdump.mobile.objects.Post;
+import com.jpgdump.mobile.util.ContextLogger;
 
 public final class FetchPosts extends AsyncTask<String, Void, List<Post>>
 {
-    private static final String TAG = "FetchPosts";
+    private final ContextLogger log = ContextLogger.getLogger(this);
     
     public static boolean pageBottomListenerFlag;
     
@@ -57,8 +57,8 @@ public final class FetchPosts extends AsyncTask<String, Void, List<Post>>
     {
         if(BuildConfig.DEBUG)
         {
-            Log.v(TAG, posts.toString() + "\n");
-            Log.v(TAG, "Done");
+            log.v(posts.toString());
+            log.v("Done");
         }
         GridView grid = (GridView) activity.findViewById(R.id.picture_viewer_activity_home);
         GridDisplayAdapter adapter = (GridDisplayAdapter) grid.getAdapter();

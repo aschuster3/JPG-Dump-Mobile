@@ -4,15 +4,14 @@ import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import android.util.Log;
-
 import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.VotingInterface;
-import com.jpgdump.mobile.util.Tags;
+import com.jpgdump.mobile.util.ContextLogger;
 
 public class VoteManager implements VotingInterface
 {
     private static final String URL = "http://jpgdump.com/api/v1/postVotes";
+    private final ContextLogger log = ContextLogger.getLogger(this);
     
     @Override
     public int distributeGoat(String sessionId, String sessionKey, 
@@ -42,11 +41,9 @@ public class VoteManager implements VotingInterface
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            
             if(BuildConfig.DEBUG)
             {
-                Log.i(Tags.VOTE_MANAGER, e.getMessage());
+                log.i(e.getMessage(), e);
             }
         }
         return responseCode;

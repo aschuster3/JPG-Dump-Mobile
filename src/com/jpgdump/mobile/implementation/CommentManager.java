@@ -15,17 +15,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
-import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.CommentsInterface;
 import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 import com.jpgdump.mobile.objects.Comment;
+import com.jpgdump.mobile.util.ContextLogger;
 
 public class CommentManager implements CommentsInterface
 {
-    private static final String TAG = "CommentManager";
-    
+    private final ContextLogger log = ContextLogger.getLogger(this);
     
     @Override
     public List<Comment> retrieveComments(int maxResults, int startIndex,
@@ -87,31 +84,23 @@ public class CommentManager implements CommentsInterface
         }
         catch (MalformedURLException e)
         {
-            if(BuildConfig.DEBUG)
-            {
-                Log.e(TAG, "The URL is misformed");
-            }
-            e.printStackTrace();
+            // Intentionally ignore error.
+            log.e("The URL is misformed", e);
         }
         catch (IOException e)
         {
-            if(BuildConfig.DEBUG)
-            {
-                Log.e(TAG, "There's a problem with the BufferedReader");
-            }
-            e.printStackTrace();
+            // Intentionally ignore error.
+            log.e("There's a problem with the BufferedReader", e);
         }
         catch (JSONException e)
         {
-            if(BuildConfig.DEBUG)
-            {
-                Log.e(TAG, "The JSON has returned something unexpected");
-            }
-            e.printStackTrace();
+            // Intentionally ignore error.
+            log.e("The JSON has returned something unexpected", e);
         }
         
         return comments;
     }
+<<<<<<< HEAD
     
     @Override
     public void postComment(String sessionId, String sessionKey,
@@ -120,4 +109,6 @@ public class CommentManager implements CommentsInterface
         // TODO: write to post comments
     }
 
+=======
+>>>>>>> 9df45c646261a20a348d7d31634b2aee67c5588b
 }

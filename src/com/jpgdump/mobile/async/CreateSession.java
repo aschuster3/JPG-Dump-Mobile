@@ -8,17 +8,18 @@ import java.net.URL;
 
 import org.json.JSONObject;
 
-import com.jpgdump.mobile.BuildConfig;
-import com.jpgdump.mobile.objects.Session;
-import com.jpgdump.mobile.util.Tags;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.util.Log;
+
+import com.jpgdump.mobile.BuildConfig;
+import com.jpgdump.mobile.objects.Session;
+import com.jpgdump.mobile.util.ContextFormattingLogger;
+import com.jpgdump.mobile.util.Tags;
 
 public class CreateSession extends AsyncTask<Void, Void, Session>
 {
+    private final ContextFormattingLogger log = ContextFormattingLogger.getLogger(this);
     private static final String URL = "http://jpgdump.com/api/v1/sessions";
     private final Activity activity;
     
@@ -80,8 +81,8 @@ public class CreateSession extends AsyncTask<Void, Void, Session>
         
         if(BuildConfig.DEBUG)
         {
-            Log.i("CreateSession", "###New Session Created###\nSession ID: " + sesh.getId() + "\n"
-                                 + "Session Key: " + sesh.getKey());
+            log.i("New Session Created: Session ID: %s Session Key: %s", 
+                    sesh.getId(), sesh.getKey());
         }
         
         editor.commit();
