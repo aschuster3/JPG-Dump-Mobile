@@ -24,6 +24,4 @@ public class Tags
     
     /*Tags*/
     public static final String RETAIN_FRAG = "RetainFragment";
-    public static final String DISKLRU = "DiskLruImageCache";
-    public static final String VOTE_MANAGER = "Vote Manager";
 }

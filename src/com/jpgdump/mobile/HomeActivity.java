@@ -2,6 +2,26 @@ package com.jpgdump.mobile;
 
 import java.io.File;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.util.LruCache;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+
 import com.jpgdump.mobile.async.CreateSession;
 import com.jpgdump.mobile.async.FetchPosts;
 import com.jpgdump.mobile.fragments.RetainFragment;
@@ -9,32 +29,14 @@ import com.jpgdump.mobile.listeners.GridPressListener;
 import com.jpgdump.mobile.listeners.NoInternetDialogListener;
 import com.jpgdump.mobile.listeners.PageBottomListener;
 import com.jpgdump.mobile.objects.Post;
+import com.jpgdump.mobile.util.ContextFormattingLogger;
 import com.jpgdump.mobile.util.DiskLruImageCache;
 import com.jpgdump.mobile.util.Tags;
 
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.util.Log;
-import android.util.LruCache;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.AbsListView.OnScrollListener;
-
 public class HomeActivity extends Activity
 {
+    private final ContextFormattingLogger log = ContextFormattingLogger.getLogger(this);
+    
     private LruCache<String, Bitmap> memoryCache;
     private DiskLruImageCache diskLruCache;
     private final Object diskCacheLock = new Object();
@@ -64,8 +66,9 @@ public class HomeActivity extends Activity
             
             if(BuildConfig.DEBUG)
             {
-                Log.i("CreateSession", "###New Session Created###\nSession ID: " + prefs.getString(Tags.SESSION_ID, "") + "\n"
-                        + "Session Key: " + prefs.getString(Tags.SESSION_KEY, ""));
+                log.i("New Session Created: (%s:%s)", 
+                    prefs.getString(Tags.SESSION_ID, ""), 
+                    prefs.getString(Tags.SESSION_KEY, ""));
             }
             
             //Retrieve settings information
@@ -155,10 +158,10 @@ public class HomeActivity extends Activity
     {
         if(BuildConfig.DEBUG)
         {
-            Log.i("HomeActivity", "Key value: " + key);
+            log.i("Bitmap Key: %s", key);
             if(bitmap == null)
             {
-                Log.i("HomeActivity", "Bitmap is null");
+                log.i("Bitmap is null");
             }
         }
         
@@ -175,7 +178,7 @@ public class HomeActivity extends Activity
             {
                 if (diskLruCache != null && !diskLruCache.containsKey(key))
                 {
-                    Log.i("Home Activity", "Cache is being added to");
+                    log.i("Cache is being added to");
                     diskLruCache.put(key, bitmap);
                 }
             }
@@ -206,8 +209,7 @@ public class HomeActivity extends Activity
             }
             if (diskLruCache != null)
             {
-
-                Log.i("Home Activity", "Cache is being accessed");
+                log.i("Cache is being accessed");
                 return diskLruCache.getBitmap(key);
             }
         }
@@ -254,7 +256,7 @@ public class HomeActivity extends Activity
     {
         if(BuildConfig.DEBUG)
         {
-            Log.i("HomeActivity", "Reached onActivityResult()");
+            log.i("Reached onActivityResult()");
         }
         
         if(requestCode == Tags.POST_REQUEST_CODE)
@@ -266,8 +268,7 @@ public class HomeActivity extends Activity
                 
                 if(BuildConfig.DEBUG)
                 {
-                    Log.i("HomeActivity", "Request and result code worked\nPosition: " + position + "\n"
-                            +"goatVal: " + goatVal);
+                    log.i("Request and result code worked! Position:%d goalVal: %d", position, goatVal);
                 }
                 
                 if(position != -1)

@@ -18,6 +18,10 @@ public final class SubmitVote extends AsyncTask<Void, Void, Integer>
     private final VoteType voteType;
     private final TextView goatCount;
     
+    private final static int COLOR_RED = 0xFFFF0013;
+    private final static int COLOR_GREEN = 0xFF00FF00;
+    private final static int COLOR_GRAY = 0xFF808080;
+    
     public SubmitVote(Activity activity, String sessionId, 
             String sessionKey, String postId, VoteType voteType,
             TextView goatCount)
@@ -54,11 +58,11 @@ public final class SubmitVote extends AsyncTask<Void, Void, Integer>
                 goatCount.setText("" + newGoats);
                 
                 if(newGoats < 0)
-                    { goatCount.setTextColor(0xFFFF0013);}
+                    { goatCount.setTextColor(COLOR_RED);}
                 else if(newGoats > 0) 
-                    { goatCount.setTextColor(0xFF00FF00);}
+                    { goatCount.setTextColor(COLOR_GREEN);}
                 else 
-                    { goatCount.setTextColor(0xFF808080);}
+                    { goatCount.setTextColor(COLOR_GRAY);}
                 break;
             case 401:
                 Toast.makeText(activity, res.getString(R.string.code401), Toast.LENGTH_SHORT).show();

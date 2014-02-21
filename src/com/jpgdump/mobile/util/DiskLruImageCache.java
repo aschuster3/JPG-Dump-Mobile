@@ -12,15 +12,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
-import android.util.Log;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 import com.jpgdump.mobile.BuildConfig;
 
 public class DiskLruImageCache
 {
-
+    private final ContextFormattingLogger log = ContextFormattingLogger.getLogger(this);
     private DiskLruCache mDiskCache;
     private boolean diskCacheStarting = true;
     private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
@@ -44,7 +42,8 @@ public class DiskLruImageCache
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            // Intentionally ignore error
+            log.w(e);
         }
     }
 
@@ -69,15 +68,8 @@ public class DiskLruImageCache
 
     private File getDiskCacheDir(Context context, String uniqueName)
     {
-
-        // Check if media is mounted or storage is built-in, if so, try and use
-        // external cache dir otherwise use internal cache dir
-        final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment
-                .getExternalStorageState())
-                || !Utils.isExternalStorageRemovable() ? Utils
-                .getExternalCacheDir(context).getPath() : context.getCacheDir()
-                .getPath();
-
+        // Try and use external cache before internal
+        String cachePath = Utils.getCacheDir(context).getPath();
         return new File(cachePath + File.separator + uniqueName);
     }
 
@@ -99,7 +91,7 @@ public class DiskLruImageCache
                 editor.commit();
                 if (BuildConfig.DEBUG)
                 {
-                    Log.d(Tags.DISKLRU, "image put on disk cache " + key);
+                    log.d("image put on disk cache %s",  key);
                 }
             }
             else
@@ -107,8 +99,7 @@ public class DiskLruImageCache
                 editor.abort();
                 if (BuildConfig.DEBUG)
                 {
-                    Log.d(Tags.DISKLRU,
-                            "ERROR on: image put on disk cache " + key);
+                    log.d("ERROR on: image put on disk cache %s", key);
                 }
             }
         }
@@ -116,8 +107,7 @@ public class DiskLruImageCache
         {
             if (BuildConfig.DEBUG)
             {
-                Log.d(Tags.DISKLRU, "ERROR on: image put on disk cache "
-                        + key);
+                log.d("ERROR on: image put on disk cache %s", key);
             }
             try
             {
@@ -166,10 +156,9 @@ public class DiskLruImageCache
             }
         }
 
-        if (BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG && bitmap != null)
         {
-            Log.d(Tags.DISKLRU, bitmap == null ? ""
-                    : "image read from disk " + key);
+            log.d("image read from disk: %s", key);
         }
 
         return bitmap;
@@ -206,7 +195,7 @@ public class DiskLruImageCache
     {
         if (BuildConfig.DEBUG)
         {
-            Log.d(Tags.DISKLRU, "disk cache CLEARED");
+            log.d("disk cache CLEARED");
         }
         try
         {
