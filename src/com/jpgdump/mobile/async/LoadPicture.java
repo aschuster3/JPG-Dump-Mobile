@@ -2,7 +2,7 @@ package com.jpgdump.mobile.async;
 
 import com.jpgdump.mobile.HomeActivity;
 import com.jpgdump.mobile.objects.Post;
-import com.jpgdump.mobile.util.PictureManager;
+import com.jpgdump.mobile.util.PictureTools;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -32,7 +32,7 @@ public class LoadPicture extends AsyncTask<Post, Void, Bitmap>
         else
         {
             //Fetch the post
-            Bitmap bmp = PictureManager.decodeSampleBitmapFromInputStream(
+            Bitmap bmp = PictureTools.decodeSampleBitmapFromInputStream(
                             post[0].getUrl(), 150, 150);
             
             //Add to the cache

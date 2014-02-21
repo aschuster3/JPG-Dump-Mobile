@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +19,7 @@ import android.util.Log;
 
 import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.CommentsInterface;
+import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 import com.jpgdump.mobile.objects.Comment;
 
 public class CommentManager implements CommentsInterface
@@ -26,7 +28,7 @@ public class CommentManager implements CommentsInterface
     
     
     @Override
-    public ArrayList<Comment> retrieveComments(int maxResults, int startIndex,
+    public List<Comment> retrieveComments(int maxResults, int startIndex,
             String sortBy, String filters)
     {
         String commentUrl = "http://jpgdump.com/api/v1/comments?startIndex=" + startIndex + 
@@ -37,7 +39,7 @@ public class CommentManager implements CommentsInterface
             commentUrl += "&filters=" + filters;
         }
         
-        ArrayList<Comment> comments = new ArrayList<Comment>();
+        List<Comment> comments = new ArrayList<Comment>();
         URL url = null;
         InputStream inputStream = null;
         try
@@ -109,6 +111,13 @@ public class CommentManager implements CommentsInterface
         }
         
         return comments;
+    }
+    
+    @Override
+    public void postComment(String sessionId, String sessionKey,
+            String postId, VoteType voteType)
+    {
+        // TODO: write to post comments
     }
 
 }

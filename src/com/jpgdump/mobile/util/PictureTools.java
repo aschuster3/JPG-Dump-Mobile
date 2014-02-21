@@ -6,7 +6,7 @@ import java.io.InputStream;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-public class PictureManager
+public class PictureTools
 {
     public static int calculateInSampleSize(BitmapFactory.Options options,
             int reqWidth, int reqHeight)
@@ -72,7 +72,10 @@ public class PictureManager
 
         try
         {
-            is1.close();
+            if(is1 != null)
+            {
+                is1.close();
+            }
         }
         catch (IOException e)
         {
