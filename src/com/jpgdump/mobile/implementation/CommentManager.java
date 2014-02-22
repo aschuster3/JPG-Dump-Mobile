@@ -99,7 +99,6 @@ public class CommentManager implements CommentsInterface
         
         return comments;
     }
-<<<<<<< HEAD
     
     @Override
     public void postComment(String sessionId, String sessionKey,
@@ -107,7 +106,4 @@ public class CommentManager implements CommentsInterface
     {
         // TODO: write to post comments
     }
-
-=======
->>>>>>> 9df45c646261a20a348d7d31634b2aee67c5588b
 }
