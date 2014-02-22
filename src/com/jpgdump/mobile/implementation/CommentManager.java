@@ -19,7 +19,6 @@ import android.util.Log;
 
 import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.CommentsInterface;
-import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 import com.jpgdump.mobile.objects.Comment;
 
 public class CommentManager implements CommentsInterface
@@ -115,7 +114,7 @@ public class CommentManager implements CommentsInterface
     
     @Override
     public void postComment(String sessionId, String sessionKey,
-            String postId, VoteType voteType)
+            String postId, String inputComment)
     {
         // TODO: write to post comments
     }
