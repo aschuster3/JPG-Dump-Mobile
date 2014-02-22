@@ -2,7 +2,6 @@ package com.jpgdump.mobile.interfaces;
 
 import java.util.List;
 
-import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 import com.jpgdump.mobile.objects.Comment;
 
 public interface CommentsInterface
@@ -11,5 +10,5 @@ public interface CommentsInterface
             String sort, String filter);
     
     public void postComment(String sessionId, String sessionKey,
-            String postId, VoteType voteType);
+            String postId, String inputComment);
 }

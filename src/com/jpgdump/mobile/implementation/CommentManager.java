@@ -16,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.jpgdump.mobile.interfaces.CommentsInterface;
-import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 import com.jpgdump.mobile.objects.Comment;
 import com.jpgdump.mobile.util.ContextLogger;
 
@@ -104,7 +103,7 @@ public class CommentManager implements CommentsInterface
     
     @Override
     public void postComment(String sessionId, String sessionKey,
-            String postId, VoteType voteType)
+            String postId, String inputComment)
     {
         // TODO: write to post comments
     }
