@@ -69,6 +69,6 @@ public final class ContextFormattingLogger {
     }
     
     public static ContextFormattingLogger getLogger(Class<?> clazz) {
-        return new ContextFormattingLogger(ContextLogger.getLogger(clazz.getSimpleName()));
+        return new ContextFormattingLogger(ContextLogger.getLogger(clazz));
     }
 }
