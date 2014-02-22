@@ -50,7 +50,7 @@ public class FullPictureViewFragment extends Fragment
         
         if(activity != null)
         {
-            view = inflater.inflate(R.layout.fragment_picture_view, container);
+            view = inflater.inflate(R.layout.fragment_picture_view, container, false);
             
             Intent intent = getActivity().getIntent();
 
@@ -109,6 +109,7 @@ public class FullPictureViewFragment extends Fragment
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.picture, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
     
     @Override

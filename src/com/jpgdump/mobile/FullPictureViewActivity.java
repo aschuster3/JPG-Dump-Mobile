@@ -24,8 +24,10 @@ public class FullPictureViewActivity extends FragmentActivity
         
         FullPictureViewFragment fragment = FullPictureViewFragment.newInstance();
         
+        fragment.setHasOptionsMenu(true);
+        
         fragManager.beginTransaction()
-                   .add(fragment, 
+                   .add(FRAME_ID, fragment, 
                            Tags.FULL_PICTURE_VIEW_FRAGMENT)
                    .commit();
         
