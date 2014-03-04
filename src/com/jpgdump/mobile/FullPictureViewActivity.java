@@ -20,20 +20,21 @@ public class FullPictureViewActivity extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_viewer);
+        
+        if(savedInstanceState == null)
+        {
 
-        //TODO: Attach the fragments to this activity
-        FragmentManager fragManager = getFragmentManager();
-        
-        FullPictureViewFragment pictureFrag = FullPictureViewFragment.newInstance();
-        
-        pictureFrag.setHasOptionsMenu(true);
-        //commentFrag.setHasOptionsMenu(true);
-        
-        fragManager.beginTransaction()
-                   .add(FRAME_ID, pictureFrag, 
-                           Tags.FULL_PICTURE_VIEW_FRAGMENT)
-                   .addToBackStack(null)
-                   .commit();
+            FragmentManager fragManager = getFragmentManager();
+            
+            FullPictureViewFragment pictureFrag = FullPictureViewFragment.newInstance();
+            pictureFrag.setHasOptionsMenu(true);
+            pictureFrag.setRetainInstance(true);
+             
+            fragManager.beginTransaction()
+                       .add(FRAME_ID, pictureFrag, 
+                               Tags.FULL_PICTURE_VIEW_FRAGMENT)
+                       .commit();
+        }
     }
 
     @Override

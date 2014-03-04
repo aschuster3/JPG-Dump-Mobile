@@ -6,6 +6,7 @@ import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.interfaces.VotingInterface.PostType;
 import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
+import com.jpgdump.mobile.listeners.CommentOverflowListener;
 import com.jpgdump.mobile.listeners.GoatPressListener;
 import com.jpgdump.mobile.objects.Comment;
 import com.jpgdump.mobile.util.ContextLogger;
@@ -64,6 +65,13 @@ public class CommentListAdapter extends BaseAdapter
             
             holder = new Holder();
             holder.commentText = (TextView) view.findViewById(R.id.comment_body);
+            
+            /*
+             * Make the text view clickable for the need of an overflow display when
+             * the message is too long.
+             */
+            holder.commentText.setClickable(true);
+            
             holder.commentVotes = (TextView) view.findViewById(R.id.comment_vote_total);
             holder.commentId = (TextView) view.findViewById(R.id.comment_id);
             holder.peakButton = (ImageButton) view.findViewById(R.id.comment_peak_button);
@@ -85,6 +93,8 @@ public class CommentListAdapter extends BaseAdapter
         
         //TODO: add an onclick to make the text view readable in a dialog
         holder.commentText.setText(comment.getComment());
+        holder.commentText.setOnClickListener(new CommentOverflowListener(context,
+                comment.getId(), comment.getComment()));
         
         int voteTotal = Integer.parseInt(comment.getUpvotes()) - 
                 Integer.parseInt(comment.getDownvotes());
