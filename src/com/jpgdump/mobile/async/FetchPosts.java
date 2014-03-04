@@ -80,7 +80,7 @@ public final class FetchPosts extends AsyncTask<String, Void, List<Post>>
         
         /*
          * Add posts as a variable to the retainFragment
-         * 
+         * If less than 4 images are left to be loaded, a new batch can be signaled
          */
         
         int postSize = posts.size();

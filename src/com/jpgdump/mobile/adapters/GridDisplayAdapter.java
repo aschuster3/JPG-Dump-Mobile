@@ -97,32 +97,23 @@ public class GridDisplayAdapter extends BaseAdapter
             bmp = activity.getBitmapFromDiskCache(post.getId());
             if(bmp == null)
             {
-                //Set the loading image and then begin loading
-                
+                //Set the loading image and then begin loading    
                 holder.thumbnail.setImageResource(R.drawable.image_loading);
             }
             else
             {
                 if(DEBUG)
-                {
-                    holder.thumbnail.setImageResource(R.drawable.disk_image_classifier);
-                }
+                { holder.thumbnail.setImageResource(R.drawable.disk_image_classifier);}
                 else
-                {
-                    holder.thumbnail.setImageBitmap(bmp);
-                }
+                { holder.thumbnail.setImageBitmap(bmp);}
             }
         }
         else
         {
             if(DEBUG)
-            {
-                holder.thumbnail.setImageResource(R.drawable.mem_image_classifier);
-            }
+            { holder.thumbnail.setImageResource(R.drawable.mem_image_classifier);}
             else
-            {
-                holder.thumbnail.setImageBitmap(bmp);
-            }
+            { holder.thumbnail.setImageBitmap(bmp);}
         }
         
         return view;

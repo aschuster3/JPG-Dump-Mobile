@@ -17,10 +17,28 @@ public interface VotingInterface
         }
     }
     
+    public static enum PostType {
+        POST(0),
+        COMMENT(1);
+        
+        private final int value;
+        
+        private PostType(int value) {
+            this.value = value;
+        }
+        
+        public final int getValue() {
+            return value;
+        }
+    }
+    
     /*
      * Returns true if successful, false otherwise (such as when you've
      * already voted on it)
      */
     public int distributeGoat(String sessionId, String sessionKey,
+            String postId, VoteType voteType);
+
+    public int distributeCommentGoat(String sessionId, String sessionKey,
             String postId, VoteType voteType);
 }

@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     
+    <item
+        android:id="@+id/comments"
+        android:orderInCategory="10"
+        android:showAsAction="ifRoom"
+        android:title="@string/comments"
+        android:icon="@drawable/ic_action_chat"/>
+    
 	<item
 	    android:id="@+id/picture_info"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/picture_info"/>
+	
 </menu>

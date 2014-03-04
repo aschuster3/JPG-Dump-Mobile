@@ -1,16 +1,18 @@
 package com.jpgdump.mobile;
 
 import com.jpgdump.mobile.fragments.FullPictureViewFragment;
+import com.jpgdump.mobile.util.ContextLogger;
 import com.jpgdump.mobile.util.Tags;
 
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 public class FullPictureViewActivity extends FragmentActivity
 {
+    private final ContextLogger log = ContextLogger.getLogger(this);
+    
     public static final int FRAME_ID = R.id.activity_post_viewer_frame;
     
     @Override
@@ -22,28 +24,46 @@ public class FullPictureViewActivity extends FragmentActivity
         //TODO: Attach the fragments to this activity
         FragmentManager fragManager = getFragmentManager();
         
-        FullPictureViewFragment fragment = FullPictureViewFragment.newInstance();
+        FullPictureViewFragment pictureFrag = FullPictureViewFragment.newInstance();
         
-        fragment.setHasOptionsMenu(true);
+        pictureFrag.setHasOptionsMenu(true);
+        //commentFrag.setHasOptionsMenu(true);
         
         fragManager.beginTransaction()
-                   .add(FRAME_ID, fragment, 
+                   .add(FRAME_ID, pictureFrag, 
                            Tags.FULL_PICTURE_VIEW_FRAGMENT)
+                   .addToBackStack(null)
                    .commit();
-        
-        Log.i("", "Attached fragment");
     }
 
     @Override
     public void onBackPressed()
     {
-        int position = getIntent().getIntExtra("position", -1);
-        int goatVal = getIntent().getIntExtra("goatVal", 0);
-
-        Intent data = new Intent();
-        data.putExtra("position", position);
-        data.putExtra("goatVal", goatVal);
-        setResult(Tags.RESULT_OK, data);
-        finish();
+        FragmentManager manager = getFragmentManager();
+        
+        if(manager.findFragmentByTag(Tags.COMMENT_VIEWER_FRAGMENT) == null)
+        {
+            if(BuildConfig.DEBUG)
+            {
+                log.i("Fragment wasn't found, finish");
+            }
+            
+            int position = getIntent().getIntExtra("position", -1);
+            int goatVal = getIntent().getIntExtra("goatVal", 0);
+    
+            Intent data = new Intent();
+            data.putExtra("position", position);
+            data.putExtra("goatVal", goatVal);
+            setResult(Tags.RESULT_OK, data);
+            finish();
+        }
+        else
+        {
+            if(BuildConfig.DEBUG)
+            {
+                log.i("Fragment was found, pop it");
+            }
+            manager.popBackStack();
+        }
     }
 }

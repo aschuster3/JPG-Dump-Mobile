@@ -3,42 +3,63 @@ package com.jpgdump.mobile.async;
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.implementation.VoteManager;
 import com.jpgdump.mobile.interfaces.VotingInterface;
+import com.jpgdump.mobile.interfaces.VotingInterface.PostType;
 import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public final class SubmitVote extends AsyncTask<Void, Void, Integer>
+public final class SubmitVote extends AsyncTask<PostType, Void, Integer>
 {
-    private final Activity activity;
-    private final String sessionId, sessionKey, postId;
+    private final Context activity;
+    private final String sessionId, sessionKey, id;
     private final VoteType voteType;
-    private final TextView goatCount;
+    private final TextView goatCountView;
     
     private final static int COLOR_RED = 0xFFFF0013;
     private final static int COLOR_GREEN = 0xFF00FF00;
     private final static int COLOR_GRAY = 0xFF808080;
     
-    public SubmitVote(Activity activity, String sessionId, 
-            String sessionKey, String postId, VoteType voteType,
-            TextView goatCount)
+    public SubmitVote(Context activity, String sessionId, 
+            String sessionKey, String id, VoteType voteType,
+            TextView goatCountView)
     {
         this.activity = activity;
         this.sessionId = sessionId;
         this.sessionKey = sessionKey;
-        this.postId = postId;
+        this.id = id;
         this.voteType = voteType;
-        this.goatCount = goatCount;
+        this.goatCountView = goatCountView;
     }
     
     @Override
-    protected Integer doInBackground(Void... params)
+    protected Integer doInBackground(PostType... params)
     {
+        /*
+         * params[0]: contains post type (currently post or comment)
+         */
+        
         VotingInterface voter = new VoteManager();
-        return voter.distributeGoat(sessionId, sessionKey, postId, voteType);
+        
+        int responseCode;
+        switch(params[0])
+        {
+        case POST:
+            responseCode = voter.distributeGoat(sessionId, sessionKey, id, voteType);
+            break;
+            
+        case COMMENT:
+            responseCode = voter.distributeCommentGoat(sessionId, sessionKey, id, voteType);
+            break;
+            
+        default:
+            responseCode = 0;
+        }
+        return responseCode;
     }
     
     @Override
@@ -50,19 +71,19 @@ public final class SubmitVote extends AsyncTask<Void, Void, Integer>
         {
             case 200:
                 Toast.makeText(activity, res.getString(R.string.code200), Toast.LENGTH_SHORT).show();
-                String num = (String) goatCount.getText();
+                String num = (String) goatCountView.getText();
                 
                 int newGoats = Integer.parseInt(num);
                 newGoats += voteType.getValue();
-                activity.getIntent().putExtra("goatVal", voteType.getValue());
-                goatCount.setText("" + newGoats);
+                ((Activity) activity).getIntent().putExtra("goatVal", voteType.getValue());
+                goatCountView.setText("" + newGoats);
                 
                 if(newGoats < 0)
-                    { goatCount.setTextColor(COLOR_RED);}
+                    { goatCountView.setTextColor(COLOR_RED);}
                 else if(newGoats > 0) 
-                    { goatCount.setTextColor(COLOR_GREEN);}
+                    { goatCountView.setTextColor(COLOR_GREEN);}
                 else 
-                    { goatCount.setTextColor(COLOR_GRAY);}
+                    { goatCountView.setTextColor(COLOR_GRAY);}
                 break;
             case 401:
                 Toast.makeText(activity, res.getString(R.string.code401), Toast.LENGTH_SHORT).show();

@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.CommentsInterface;
 import com.jpgdump.mobile.objects.Comment;
 import com.jpgdump.mobile.util.ContextLogger;
@@ -24,7 +25,7 @@ public class CommentManager implements CommentsInterface
     private final ContextLogger log = ContextLogger.getLogger(this);
     
     @Override
-    public List<Comment> retrieveComments(int maxResults, int startIndex,
+    public List<Comment> retrieveComments(String maxResults, String startIndex,
             String sortBy, String filters)
     {
         String commentUrl = "http://jpgdump.com/api/v1/comments?startIndex=" + startIndex + 
@@ -33,6 +34,11 @@ public class CommentManager implements CommentsInterface
         if(!filters.equals(""))
         {
             commentUrl += "&filters=" + filters;
+        }
+        
+        if(BuildConfig.DEBUG)
+        {
+            log.i("Comment Url: " + commentUrl);
         }
         
         List<Comment> comments = new ArrayList<Comment>();
