@@ -75,7 +75,6 @@ public class CommentListAdapter extends BaseAdapter
             holder.commentVotes = (TextView) view.findViewById(R.id.comment_vote_total);
             holder.commentId = (TextView) view.findViewById(R.id.comment_id);
             holder.peakButton = (ImageButton) view.findViewById(R.id.comment_peak_button);
-            holder.weakButton = (ImageButton) view.findViewById(R.id.comment_weak_button);
             
             view.setTag(holder);
         }
@@ -104,15 +103,13 @@ public class CommentListAdapter extends BaseAdapter
         holder.commentId.setText(comment.getId());
         holder.peakButton.setOnClickListener(new GoatPressListener(context, comment.getId(), VoteType.UP,
                 holder.commentVotes, PostType.COMMENT));
-        holder.weakButton.setOnClickListener(new GoatPressListener(context, comment.getId(), VoteType.DOWN,
-                holder.commentVotes, PostType.COMMENT));
         return view;
     }
     
     static class Holder
     {
         public TextView commentText, commentVotes, commentId;
-        public ImageButton peakButton, weakButton;
+        public ImageButton peakButton;
     }
     
     /**

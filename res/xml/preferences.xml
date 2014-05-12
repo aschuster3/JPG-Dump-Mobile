@@ -5,4 +5,5 @@
         android:title="@string/pref_nsfw"
         android:summary="@string/pref_nsfw_summ"
         android:defaultValue="false" />
+    
 </PreferenceScreen>

@@ -86,8 +86,7 @@ public final class FetchPosts extends AsyncTask<String, Void, List<Post>>
         int postSize = posts.size();
         for(int x = 0; x < postSize; x++)
         {
-            new LoadPicture(activity, adapter).execute(posts.get(x));
-            
+            new LoadPicture(activity, adapter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, posts.get(x));            
             pageBottomListenerFlag = (postSize - x) < 4;
         }
     }
