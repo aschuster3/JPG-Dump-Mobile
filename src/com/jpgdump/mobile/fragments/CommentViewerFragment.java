@@ -2,16 +2,22 @@ package com.jpgdump.mobile.fragments;
 
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.async.FetchComments;
+import com.jpgdump.mobile.util.ContextFormattingLogger;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 public class CommentViewerFragment extends Fragment
 {
+    private final ContextFormattingLogger log = ContextFormattingLogger.getLogger(this);
+    
     public static CommentViewerFragment newInstance(String postId)
     {
         CommentViewerFragment frag = new CommentViewerFragment();
@@ -50,5 +56,32 @@ public class CommentViewerFragment extends Fragment
         }
 
         return view;
+    }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.comments, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        Activity activity = getActivity();
+        
+        log.i("Item id: " + item.getItemId() + "\nAndroid Home: " + android.R.id.home);
+        
+        // Handle item selection
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                activity.onBackPressed();
+                
+            default:
+                return super.onOptionsItemSelected(item);
+            
+        }
     }
 }

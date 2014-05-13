@@ -101,7 +101,7 @@ public class CommentListAdapter extends BaseAdapter
         
         setGoatAmount(holder.commentVotes, voteTotal);
         holder.commentId.setText(comment.getId());
-        holder.peakButton.setOnClickListener(new GoatPressListener(context, comment.getId(), VoteType.UP,
+        holder.peakButton.setOnClickListener(new GoatPressListener(context, comment, VoteType.UP,
                 holder.commentVotes, PostType.COMMENT));
         return view;
     }

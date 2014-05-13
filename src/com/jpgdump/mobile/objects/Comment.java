@@ -56,9 +56,17 @@ public class Comment
     {
         return upvotes;
     }
+    public void addUpvote()
+    {
+        upvotes = "" + (Integer.parseInt(upvotes) + 1);
+    }
     public String getDownvotes()
     {
         return downvotes;
+    }
+    public void addDownvote()
+    {
+        downvotes = "" + (Integer.parseInt(downvotes) + 1);
     }
     public String getScore()
     {

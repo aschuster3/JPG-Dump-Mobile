@@ -132,62 +132,29 @@ public class FullPictureViewFragment extends Fragment
         switch (item.getItemId())
         {
         case R.id.picture_info:
-            String width = intent.getStringExtra("width");
-            String height = intent.getStringExtra("height");
-            String score = intent.getStringExtra("score");
-            String created = (String) DateFormat
-                    .format("dd-MM-yyyy", Long.parseLong(intent
-                            .getStringExtra("created")) * 1000);
-
-            LayoutInflater inflater = activity.getLayoutInflater();
-            LinearLayout popup = (LinearLayout) inflater.inflate(
-                    R.layout.pic_info_popup, null);
-
-            TextView widthTV = new TextView(activity);
-            widthTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            TextView heightTV = new TextView(activity);
-            heightTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            TextView scoreTV = new TextView(activity);
-            scoreTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            TextView dateTV = new TextView(activity);
-            dateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-
-            widthTV.setText("Width:\t\t\t" + width);
-            widthTV.setTextColor(0xFFFFFFFF);
-            heightTV.setText("Height:\t\t\t" + height);
-            heightTV.setTextColor(0xFFFFFFFF);
-            scoreTV.setText("Score:\t\t\t" + score);
-            scoreTV.setTextColor(0xFFFFFFFF);
-            dateTV.setText("Date:\t\t\t" + created);
-            dateTV.setTextColor(0xFFFFFFFF);
-
-            popup.addView(widthTV);
-            popup.addView(heightTV);
-            popup.addView(scoreTV);
-            popup.addView(dateTV);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-            builder.setView(popup).setCancelable(true);
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-            dialog.getWindow().setLayout((int) pxFromDp(250),
-                    (int) pxFromDp(300));
+            pictureInfoPopup(activity, intent);
 
             return true;
         case R.id.comments:
             FragmentManager manager = getActivity().getFragmentManager();
             
+            Fragment commentFrag = CommentViewerFragment.newInstance(intent.getStringExtra("postId"));
+            commentFrag.setHasOptionsMenu(true);
+            
             manager.beginTransaction()
                    .replace(FullPictureViewActivity.FRAME_ID, 
-                           CommentViewerFragment.newInstance(intent.getStringExtra("postId")),
+                           commentFrag,
                            Tags.COMMENT_VIEWER_FRAGMENT)
                    .addToBackStack(null)
                    .commit();
             return true;
+            
+        case android.R.id.home:
+            activity.onBackPressed();
+            
         default:
-
             return super.onOptionsItemSelected(item);
+            
         }
     }
 
@@ -212,6 +179,54 @@ public class FullPictureViewFragment extends Fragment
         {
             goatCountView.setTextColor(0xFF808080);
         }
+    }
+    
+    /*
+     * Brings up a popup up with the properties of a picture
+     */
+    private void pictureInfoPopup(Activity activity, Intent intent)
+    {
+        String width = intent.getStringExtra("width");
+        String height = intent.getStringExtra("height");
+        String score = intent.getStringExtra("score");
+        String created = (String) DateFormat
+                .format("dd-MM-yyyy", Long.parseLong(intent
+                        .getStringExtra("created")) * 1000);
+
+        LayoutInflater inflater = activity.getLayoutInflater();
+        LinearLayout popup = (LinearLayout) inflater.inflate(
+                R.layout.pic_info_popup, null);
+
+        TextView widthTV = new TextView(activity);
+        widthTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        TextView heightTV = new TextView(activity);
+        heightTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        TextView scoreTV = new TextView(activity);
+        scoreTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        TextView dateTV = new TextView(activity);
+        dateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+
+        widthTV.setText("Width:\t\t\t" + width);
+        widthTV.setTextColor(0xFFFFFFFF);
+        heightTV.setText("Height:\t\t\t" + height);
+        heightTV.setTextColor(0xFFFFFFFF);
+        scoreTV.setText("Score:\t\t\t" + score);
+        scoreTV.setTextColor(0xFFFFFFFF);
+        dateTV.setText("Date:\t\t\t" + created);
+        dateTV.setTextColor(0xFFFFFFFF);
+
+        popup.addView(widthTV);
+        popup.addView(heightTV);
+        popup.addView(scoreTV);
+        popup.addView(dateTV);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setView(popup).setCancelable(true);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setLayout((int) pxFromDp(250),
+                (int) pxFromDp(300));
     }
 
 }

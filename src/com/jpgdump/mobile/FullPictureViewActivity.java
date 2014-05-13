@@ -21,6 +21,8 @@ public class FullPictureViewActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_viewer);
         
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        
         if(savedInstanceState == null)
         {
 
