@@ -1,6 +1,7 @@
 package com.jpgdump.mobile.implementation;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,6 +24,8 @@ import com.jpgdump.mobile.util.ContextLogger;
 public class CommentManager implements CommentsInterface
 {
     private final ContextLogger log = ContextLogger.getLogger(this);
+    
+    private final static String POST_COMMENT_URL = "http://jpgdump.com/api/v1/comments";
     
     @Override
     public List<Comment> retrieveComments(String maxResults, String startIndex,
@@ -75,6 +78,9 @@ public class CommentManager implements CommentsInterface
                 for(int i = 0; i < rawList.length(); i++)
                 {
                     commentSplit = rawList.getJSONObject(i);
+                    
+                    String parsedComment = commentParser(commentSplit.getString("comment"));
+                    
                     comments.add(new Comment(commentSplit.getString("kind"), commentSplit.getString("id"),
                             commentSplit.getString("postId"), commentSplit.getString("comment"), 
                             commentSplit.getString("created"), commentSplit.getString("ordinal"), 
@@ -107,9 +113,64 @@ public class CommentManager implements CommentsInterface
     }
     
     @Override
-    public void postComment(String sessionId, String sessionKey,
+    public int postComment(String sessionId, String sessionKey,
             String postId, String inputComment)
     {
-        // TODO: write to post comments
+        int responseCode = 1337;
+        try
+        {
+            URL obj = new URL(POST_COMMENT_URL);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            
+            con.setRequestMethod("POST");
+            con.setRequestProperty("X-Jpgdump-Session-Key", sessionKey);
+            con.setRequestProperty("X-Jpgdump-Session-Id", sessionId);
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            
+            String params = "postId=" + postId + "&comment=" + inputComment;
+            
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(params);
+            wr.flush();
+            wr.close();
+
+            responseCode = con.getResponseCode();
+            
+        }
+        catch (Exception e)
+        {
+            if(BuildConfig.DEBUG)
+            {
+                log.i(e.getMessage(), e);
+            }
+        }
+        return responseCode;
+    }
+    
+    /**
+     * This method will replace ^###### and >###### 
+     * with links to the pictures and posts respectively.
+     * 
+     * @param comment
+     * @return
+     */
+    private String commentParser(String comment)
+    {
+        int indexOfCarrot = comment.indexOf("^");
+        StringBuilder parsedComment = new StringBuilder(comment);
+        StringBuilder postId = new StringBuilder("");
+        
+        //The carrot corresponds to pictures, so this will replace ^##### with a link to a picture
+        while(indexOfCarrot != -1)
+        {
+            for(int i = indexOfCarrot + 1; comment.charAt(i) >= '0' && comment.charAt(i) <= '9'; i++)
+            {
+                postId = postId.append(comment.charAt(i));
+                parsedComment.deleteCharAt(i);
+            }
+        }
+        
+        return comment;
     }
 }

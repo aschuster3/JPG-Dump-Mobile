@@ -86,15 +86,15 @@ public final class SubmitVote extends AsyncTask<PostType, Void, Integer>
         switch (responseCode)
         {
             case 200:
-                Toast.makeText(activity, res.getString(R.string.code200), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, res.getString(R.string.code200vote), Toast.LENGTH_SHORT).show();
                 updateView();
                 checkAndUpdateComment();
                 break;
             case 401:
-                Toast.makeText(activity, res.getString(R.string.code401), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, res.getString(R.string.code401vote), Toast.LENGTH_SHORT).show();
                 break;
             case 403:
-                Toast.makeText(activity, res.getString(R.string.code403), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, res.getString(R.string.code403vote), Toast.LENGTH_SHORT).show();
                 break;
             default:
                 Toast.makeText(activity, res.getString(R.string.codeWTF), Toast.LENGTH_SHORT).show();

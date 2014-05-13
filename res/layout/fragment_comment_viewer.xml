@@ -8,8 +8,35 @@
         android:id="@+id/comments_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_weight="4"
         android:divider="@drawable/comment_list_divider"/>
+    
+    <LinearLayout 
+        android:id="@+id/comment_submission"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_weight="1"
+	    android:background="@drawable/comment_background"
+        android:orientation="horizontal">
+        
+        <EditText
+	        android:id="@+id/comment_text_field"
+	        android:layout_width="0dp"
+	        android:layout_height="match_parent"
+	        android:layout_weight="3"
+	        android:inputType="textMultiLine"
+	        android:imeOptions="actionDone"
+	        android:hint="@string/comment_hint" />
+        
+        <Button
+            android:id="@+id/comment_submit_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:text="@string/comment_submit" />
+        
+    </LinearLayout>
     
 
 </LinearLayout>

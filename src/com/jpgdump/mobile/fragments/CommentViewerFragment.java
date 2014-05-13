@@ -2,6 +2,7 @@ package com.jpgdump.mobile.fragments;
 
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.async.FetchComments;
+import com.jpgdump.mobile.listeners.SubmitCommentListener;
 import com.jpgdump.mobile.util.ContextFormattingLogger;
 
 import android.app.Activity;
@@ -13,10 +14,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 public class CommentViewerFragment extends Fragment
 {
     private final ContextFormattingLogger log = ContextFormattingLogger.getLogger(this);
+    
+    private EditText commentTextField;
+    private Button commentSubmitButton;
     
     public static CommentViewerFragment newInstance(String postId)
     {
@@ -46,6 +52,11 @@ public class CommentViewerFragment extends Fragment
              */
             Bundle bundle = getArguments();
             String postId = bundle.getString("postId");
+            
+            commentTextField = (EditText) view.findViewById(R.id.comment_text_field);
+            commentSubmitButton = (Button) view.findViewById(R.id.comment_submit_button);
+            
+            commentSubmitButton.setOnClickListener(new SubmitCommentListener(commentTextField, postId, activity));
             
             String[] commentParams = new String[3];
             commentParams[0] = "10";

@@ -9,6 +9,6 @@ public interface CommentsInterface
     public List<Comment> retrieveComments(String maxResult, String startIndex, 
             String sort, String filter);
     
-    public void postComment(String sessionId, String sessionKey,
+    public int postComment(String sessionId, String sessionKey,
             String postId, String inputComment);
 }

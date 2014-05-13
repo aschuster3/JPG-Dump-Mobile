@@ -11,15 +11,24 @@
     <string name="no_internet_dialog_negative">Cancel</string>
     <string name="weak">Weak</string>
     <string name="peak">Peak</string>
-    <string name="code200">Vote submitted</string>
-    <string name="code401">There\'s something wrong with your session</string>
-    <string name="code403">You can\'t vote more than once</string>
-    <string name="codeWTF">I have no idea what the hell you did</string>
     <string name="refresh">Refresh</string>
     <string name="settings_dialog_title">So about those settings</string>
     <string name="settings_dialog_message">Hey, so, there aren\'t any settings, yet.  If there\'s a particular setting you\'d like to see, email me at rfserverstudios@gmail.com and I\'ll see what I can do!</string>
     <string name="okay_button">Okay</string>
     <string name="button_content_description">This is a weak or peak button</string>
+    <string name="comment_hint">Add your own comment</string>
+    <string name="comment_submit">Submit</string>
+    
+    <!-- Response Code responses -->
+    <string name="code200vote">Vote submitted</string>
+    <string name="code401vote">There\'s something wrong with your session</string>
+    <string name="code403vote">You can\'t vote more than once</string>
+    <string name="code200comment">Comment submitted</string>
+    <string name="code401comment">There\'s something wrong with your session</string>
+    <string name="code403comment">You can\'t reply to your own comment!</string>
+    <string name="codeWTF">I have no idea what the hell you did</string>
+    
+    
     
     <!-- Settings -->
     <string name="pref_nsfw">NSFW</string>
