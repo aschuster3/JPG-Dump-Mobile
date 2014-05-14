@@ -4,14 +4,16 @@ import java.util.List;
 
 import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.R;
+import com.jpgdump.mobile.implementation.CommentReferenceSpan;
+import com.jpgdump.mobile.implementation.PictureReferenceSpan;
 import com.jpgdump.mobile.interfaces.VotingInterface.PostType;
 import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
-import com.jpgdump.mobile.listeners.CommentOverflowListener;
 import com.jpgdump.mobile.listeners.GoatPressListener;
 import com.jpgdump.mobile.objects.Comment;
-import com.jpgdump.mobile.util.ContextLogger;
 
 import android.content.Context;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,7 @@ import android.widget.TextView;
 
 public class CommentListAdapter extends BaseAdapter
 {
-    private final ContextLogger log = ContextLogger.getLogger(this);
+    //private final ContextLogger log = ContextLogger.getLogger(this);
     
     Context context;
     List<Comment> comments;
@@ -66,12 +68,6 @@ public class CommentListAdapter extends BaseAdapter
             holder = new Holder();
             holder.commentText = (TextView) view.findViewById(R.id.comment_body);
             
-            /*
-             * Make the text view clickable for the need of an overflow display when
-             * the message is too long.
-             */
-            holder.commentText.setClickable(true);
-            
             holder.commentVotes = (TextView) view.findViewById(R.id.comment_vote_total);
             holder.commentId = (TextView) view.findViewById(R.id.comment_id);
             holder.peakButton = (ImageButton) view.findViewById(R.id.comment_peak_button);
@@ -85,15 +81,14 @@ public class CommentListAdapter extends BaseAdapter
         
         if(BuildConfig.DEBUG)
         {
-            log.i("Comment at pos " + position + " is: " + comments.get(position).getComment());
+            //log.i("Comment at pos " + position + " is: " + comments.get(position).getComment());
         }
         
         final Comment comment = comments.get(position);
         
-        //TODO: add an onclick to make the text view readable in a dialog
-        holder.commentText.setText(comment.getComment());
-        holder.commentText.setOnClickListener(new CommentOverflowListener(context,
-                comment.getId(), comment.getComment()));
+        holder.commentText.setText(parseComment(comment.getComment()));
+        holder.commentText.setMovementMethod(LinkMovementMethod.getInstance());
+        
         
         int voteTotal = Integer.parseInt(comment.getUpvotes()) - 
                 Integer.parseInt(comment.getDownvotes());
@@ -136,5 +131,64 @@ public class CommentListAdapter extends BaseAdapter
         {
             goatCountView.setTextColor(0xFF808080);
         }
+    }
+    
+    /**
+     * A helper that sets Spans for picture references and
+     * comment references.
+     * 
+     * @param comment Unparsed comment
+     * @return Parsed comment with proper Spans
+     */
+    private SpannableString parseComment(CharSequence comment)
+    {
+        StringBuilder picId = new StringBuilder();
+        SpannableString parsedComment = new SpannableString(comment);
+        
+        // Find the picture references and set their spans
+        int     indexOfCarrot = ((String)comment).indexOf("^"),
+                endSpan = indexOfCarrot + 1;
+        while(indexOfCarrot != -1)
+        {
+            while(endSpan < comment.length() && comment.charAt(endSpan) >= '0' && comment.charAt(endSpan) <= '9')
+            {
+                picId.append(comment.charAt(endSpan));
+                endSpan++;
+            }
+            
+            if(picId.toString().matches("[0-9]+"))
+            {
+                parsedComment.setSpan(new PictureReferenceSpan(picId.toString()), indexOfCarrot, endSpan, 0);
+            }
+            
+            indexOfCarrot = comment.toString().indexOf("^", endSpan);
+            endSpan = indexOfCarrot + 1;
+            picId = new StringBuilder();
+        }
+        
+        // Find the comment references and set their spans
+        int     indexOfAngleBracket = ((String)comment).indexOf(">");
+        endSpan = indexOfAngleBracket + 1;
+        
+        while(indexOfAngleBracket != -1)
+        {
+            while(endSpan < comment.length() && comment.charAt(endSpan) >= '0' && comment.charAt(endSpan) <= '9')
+            {
+                picId.append(comment.charAt(endSpan));
+                endSpan++;
+            }
+            
+            if(picId.toString().matches("[0-9]+"))
+            {
+                parsedComment.setSpan(new CommentReferenceSpan(picId.toString()), indexOfAngleBracket, endSpan, 0);
+            }
+            
+            indexOfAngleBracket = comment.toString().indexOf(">", endSpan);
+            endSpan = indexOfAngleBracket + 1;
+            picId = new StringBuilder();
+        }
+        
+        
+        return parsedComment;
     }
 }

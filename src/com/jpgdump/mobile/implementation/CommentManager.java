@@ -79,8 +79,6 @@ public class CommentManager implements CommentsInterface
                 {
                     commentSplit = rawList.getJSONObject(i);
                     
-                    String parsedComment = commentParser(commentSplit.getString("comment"));
-                    
                     comments.add(new Comment(commentSplit.getString("kind"), commentSplit.getString("id"),
                             commentSplit.getString("postId"), commentSplit.getString("comment"), 
                             commentSplit.getString("created"), commentSplit.getString("ordinal"), 
@@ -146,31 +144,5 @@ public class CommentManager implements CommentsInterface
             }
         }
         return responseCode;
-    }
-    
-    /**
-     * This method will replace ^###### and >###### 
-     * with links to the pictures and posts respectively.
-     * 
-     * @param comment
-     * @return
-     */
-    private String commentParser(String comment)
-    {
-        int indexOfCarrot = comment.indexOf("^");
-        StringBuilder parsedComment = new StringBuilder(comment);
-        StringBuilder postId = new StringBuilder("");
-        
-        //The carrot corresponds to pictures, so this will replace ^##### with a link to a picture
-        while(indexOfCarrot != -1)
-        {
-            for(int i = indexOfCarrot + 1; comment.charAt(i) >= '0' && comment.charAt(i) <= '9'; i++)
-            {
-                postId = postId.append(comment.charAt(i));
-                parsedComment.deleteCharAt(i);
-            }
-        }
-        
-        return comment;
     }
 }

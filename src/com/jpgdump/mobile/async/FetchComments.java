@@ -45,14 +45,17 @@ public class FetchComments extends AsyncTask<String, Void, List<Comment>>
          * 
          * Check if comments are present.  If they are not, don't make the adapter
          */
-        View view = fragment.getView();
-        ListView commentList = (ListView) view.findViewById(R.id.comments_list);
-        
-        if(comments.size() != 0)
+        if(fragment != null && fragment.getActivity() != null)
         {
-            BaseAdapter commentViewAdapter = new CommentListAdapter(fragment.getActivity(), comments);
+            View view = fragment.getView();
+            ListView commentList = (ListView) view.findViewById(R.id.comments_list);
             
-            commentList.setAdapter(commentViewAdapter);
+            if(comments.size() != 0)
+            {
+                BaseAdapter commentViewAdapter = new CommentListAdapter(fragment.getActivity(), comments);
+                
+                commentList.setAdapter(commentViewAdapter);
+            }
         }
     }
 }
