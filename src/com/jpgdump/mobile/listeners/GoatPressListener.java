@@ -8,6 +8,7 @@ import com.jpgdump.mobile.util.Tags;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
@@ -53,11 +54,11 @@ public final class GoatPressListener implements OnClickListener
         
         if(comment == null)
         {
-            new SubmitVote(activity, sessionId, sessionKey, postId, voteType, goatCount).execute(type);
+            new SubmitVote(activity, sessionId, sessionKey, postId, voteType, goatCount).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, type);
         }
         else
         {
-            new SubmitVote(activity, sessionId, sessionKey, comment, voteType, goatCount).execute(type);
+            new SubmitVote(activity, sessionId, sessionKey, comment, voteType, goatCount).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, type);
         }
     }
 }

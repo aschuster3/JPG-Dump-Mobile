@@ -99,4 +99,63 @@ public class PostManager implements PostsInterface
         }
         return posts;
     }
+    
+    public String getPictureURL(String picId)
+    {
+        String postUrl = "http://jpgdump.com/api/v1/posts/" + picId;
+        
+        String picUrl = null;
+        URL url = null;
+        InputStream inputStream = null;
+        try
+        {
+            //Connect to the given url and open the connection
+            url = new URL(postUrl);
+            URLConnection conn = url.openConnection();
+            HttpURLConnection httpConn = (HttpURLConnection) conn;
+            
+            httpConn.setRequestMethod("GET");
+            httpConn.connect();
+
+            if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK)
+            {
+                //If the connection is successful, read in the stream
+                inputStream = httpConn.getInputStream();
+                BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+                
+                StringBuilder total = new StringBuilder();
+                String line;
+                while ((line = r.readLine()) != null) 
+                {
+                    total.append(line);
+                }
+                
+                
+                //Parse the JSON and split it into the individual Posts
+                JSONObject rawJson = new JSONObject(total.toString());
+                
+                picUrl = rawJson.getString("url");
+            }
+            else
+            {
+                throw new MalformedURLException("Teh interwebz is broken");
+            }
+        }
+        catch (MalformedURLException e)
+        {
+            // Intentionally ignore error.
+            log.e("The URL is misformed", e);
+        }
+        catch (IOException e)
+        {
+            // Intentionally ignore error.
+            log.e("There's a problem with the BufferedReader", e);
+        }
+        catch (JSONException e)
+        {
+            // Intentionally ignore error.
+            log.e("The JSON has returned something unexpected", e);
+        }
+        return picUrl;
+    }
 }

@@ -20,4 +20,6 @@ public interface PostsInterface
      */
     public ArrayList<Post> retrievePosts(String maxResults, String startIndex, 
             String sortBy, String filters);
+    
+    public String getPictureURL(String picId);
 }

@@ -145,4 +145,68 @@ public class CommentManager implements CommentsInterface
         }
         return responseCode;
     }
+
+    @Override
+    public String retrieveComment(String commentId)
+    {
+        String commentUrl = "http://jpgdump.com/api/v1/comments/" + commentId;
+        
+        String comment = null;
+        
+        if(BuildConfig.DEBUG)
+        {
+            log.i("Comment Url: " + commentUrl);
+        }
+        
+        URL url = null;
+        InputStream inputStream = null;
+        try
+        {
+            //Connect to the given url and open the connection
+            url = new URL(commentUrl);
+            URLConnection conn = url.openConnection();
+            HttpURLConnection httpConn = (HttpURLConnection) conn;
+            
+            httpConn.setRequestMethod("GET");
+            httpConn.connect();
+
+            if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK)
+            {
+                //If the connection is successful, read in the stream
+                inputStream = httpConn.getInputStream();
+                BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+                
+                StringBuilder total = new StringBuilder();
+                String line;
+                while ((line = r.readLine()) != null) 
+                {
+                    total.append(line);
+                }
+                
+                JSONObject rawJson = new JSONObject(total.toString());
+                
+                comment = rawJson.getString("comment");
+            }
+            else
+            {
+                throw new MalformedURLException("Teh interwebz is broken with response code " + httpConn.getResponseCode());
+            }
+        }
+        catch (MalformedURLException e)
+        {
+            // Intentionally ignore error.
+            log.e("The URL is misformed", e);
+        }
+        catch (IOException e)
+        {
+            // Intentionally ignore error.
+            log.e("There's a problem with the BufferedReader", e);
+        }
+        catch (JSONException e)
+        {
+            // Intentionally ignore error.
+            log.e("The JSON has returned something unexpected", e);
+        }
+        return comment;
+    }
 }

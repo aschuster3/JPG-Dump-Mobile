@@ -8,9 +8,11 @@ import com.jpgdump.mobile.implementation.CommentReferenceSpan;
 import com.jpgdump.mobile.implementation.PictureReferenceSpan;
 import com.jpgdump.mobile.interfaces.VotingInterface.PostType;
 import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
+import com.jpgdump.mobile.listeners.CommentIdClickListener;
 import com.jpgdump.mobile.listeners.GoatPressListener;
 import com.jpgdump.mobile.objects.Comment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
@@ -18,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -26,12 +29,14 @@ public class CommentListAdapter extends BaseAdapter
     //private final ContextLogger log = ContextLogger.getLogger(this);
     
     Context context;
+    EditText commentTextField;
     List<Comment> comments;
     int layout;
     
-    public CommentListAdapter(Context context, List<Comment> comments)
+    public CommentListAdapter(Context context, EditText commentTextField, List<Comment> comments)
     {
         this.context = context;
+        this.commentTextField = commentTextField;
         this.comments = comments;
         this.layout = R.layout.comment_container;
     }
@@ -93,9 +98,10 @@ public class CommentListAdapter extends BaseAdapter
         int voteTotal = Integer.parseInt(comment.getUpvotes()) - 
                 Integer.parseInt(comment.getDownvotes());
         
-        
         setGoatAmount(holder.commentVotes, voteTotal);
         holder.commentId.setText(comment.getId());
+        holder.commentId.setOnClickListener(new CommentIdClickListener(comment.getId(), commentTextField));
+        
         holder.peakButton.setOnClickListener(new GoatPressListener(context, comment, VoteType.UP,
                 holder.commentVotes, PostType.COMMENT));
         return view;
@@ -158,7 +164,7 @@ public class CommentListAdapter extends BaseAdapter
             
             if(picId.toString().matches("[0-9]+"))
             {
-                parsedComment.setSpan(new PictureReferenceSpan(picId.toString()), indexOfCarrot, endSpan, 0);
+                parsedComment.setSpan(new PictureReferenceSpan(picId.toString(), (Activity) context), indexOfCarrot, endSpan, 0);
             }
             
             indexOfCarrot = comment.toString().indexOf("^", endSpan);
@@ -180,7 +186,7 @@ public class CommentListAdapter extends BaseAdapter
             
             if(picId.toString().matches("[0-9]+"))
             {
-                parsedComment.setSpan(new CommentReferenceSpan(picId.toString()), indexOfAngleBracket, endSpan, 0);
+                parsedComment.setSpan(new CommentReferenceSpan(picId.toString(), (Activity) context), indexOfAngleBracket, endSpan, 0);
             }
             
             indexOfAngleBracket = comment.toString().indexOf(">", endSpan);

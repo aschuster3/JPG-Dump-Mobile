@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.jpgdump.mobile.R;
@@ -49,10 +50,11 @@ public class FetchComments extends AsyncTask<String, Void, List<Comment>>
         {
             View view = fragment.getView();
             ListView commentList = (ListView) view.findViewById(R.id.comments_list);
+            EditText commentTextField = (EditText) view.findViewById(R.id.comment_text_field);
             
             if(comments.size() != 0)
             {
-                BaseAdapter commentViewAdapter = new CommentListAdapter(fragment.getActivity(), comments);
+                BaseAdapter commentViewAdapter = new CommentListAdapter(fragment.getActivity(), commentTextField, comments);
                 
                 commentList.setAdapter(commentViewAdapter);
             }

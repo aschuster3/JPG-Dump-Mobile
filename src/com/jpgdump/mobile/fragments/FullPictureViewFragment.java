@@ -64,6 +64,7 @@ public class FullPictureViewFragment extends Fragment
             String downvotes = intent.getStringExtra("downvotes") == null ? "0"
                     : intent.getStringExtra("downvotes");
             String titleStr = intent.getStringExtra("title");
+            String height = intent.getStringExtra("height");
 
             int goatTotal = Integer.parseInt(upvotes)
                     - Integer.parseInt(downvotes);
@@ -102,11 +103,31 @@ public class FullPictureViewFragment extends Fragment
             fullImage.getSettings().setUseWideViewPort(true);
             fullImage.getSettings().setLoadWithOverviewMode(true);
 
-            // This html formatting will center the image within the webview
-            String HTML_FORMAT = "<html><head><style>img {position:absolute; "
-                    + "top:0; bottom:0; left:0; right:0; margin:auto;}</style>" 
-                    + "<body bgcolor=\"black\"><img src = "
-                    + "\"%s\" /></body></html>";
+            // This html formatting will center the image within the webview and make the background black
+            String HTML_FORMAT;
+            
+            if(Integer.parseInt(height) < 2000)
+            {
+                HTML_FORMAT = "<html><head><style>img {position:absolute; "
+                        + "top:0; bottom:0; left:0; right:0; margin:auto;}</style>" 
+                        + "<body bgcolor=\"black\"><img src = "
+                        + "\"%s\" /></body></html>";
+            }
+            else
+            {
+                HTML_FORMAT = "<html><head><style>img {display:block; "
+                        + "margin:auto}</style>" 
+                        + "<body bgcolor=\"black\"><img src = "
+                        + "\"%s\" /></body></html>";
+            }
+         
+            // This html formatting will make the background black
+//            String HTML_FORMAT = "<html><head>"
+//                    + "<body bgcolor=\"black\"><img src = "
+//                    + "\"%s\" /></body></html>";
+            
+            // This html formatting will center the image horizontally and make the background black
+            
             final String html = String.format(HTML_FORMAT, picUrl);
             fullImage.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
         }
