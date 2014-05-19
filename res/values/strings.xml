@@ -30,8 +30,9 @@
     <string name="code401vote">There\'s something wrong with your session</string>
     <string name="code403vote">You can\'t vote more than once</string>
     <string name="code200comment">Comment submitted</string>
+    <string name="code400comment">You cannot submit an empty comment</string>
     <string name="code401comment">There\'s something wrong with your session</string>
-    <string name="code403comment">You can\'t reply to your own comment!</string>
+    <string name="code403comment">You can\'t reply to your own comment</string>
     <string name="codeWTF">I have no idea what the hell you did</string>
     
     

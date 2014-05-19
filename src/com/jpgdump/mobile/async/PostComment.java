@@ -67,6 +67,9 @@ public class PostComment extends AsyncTask<String, Void, Integer>
                     imm.hideSoftInputFromWindow(textField.getWindowToken(), 0);
                 }
                 break;
+            case 400:
+                Toast.makeText(activity, res.getString(R.string.code400comment), Toast.LENGTH_SHORT).show();
+                break;
             case 401:
                 Toast.makeText(activity, res.getString(R.string.code401comment), Toast.LENGTH_SHORT).show();
                 break;

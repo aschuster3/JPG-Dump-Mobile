@@ -213,6 +213,7 @@ public class FullPictureViewFragment extends Fragment
         String created = (String) DateFormat
                 .format("dd-MM-yyyy", Long.parseLong(intent
                         .getStringExtra("created")) * 1000);
+        String postId = intent.getStringExtra("postId");
 
         LayoutInflater inflater = activity.getLayoutInflater();
         LinearLayout popup = (LinearLayout) inflater.inflate(
@@ -226,6 +227,8 @@ public class FullPictureViewFragment extends Fragment
         scoreTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         TextView dateTV = new TextView(activity);
         dateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        TextView postIdTV = new TextView(activity);
+        postIdTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
 
         widthTV.setText("Width:\t\t\t" + width);
         widthTV.setTextColor(0xFFFFFFFF);
@@ -235,14 +238,17 @@ public class FullPictureViewFragment extends Fragment
         scoreTV.setTextColor(0xFFFFFFFF);
         dateTV.setText("Date:\t\t\t" + created);
         dateTV.setTextColor(0xFFFFFFFF);
+        postIdTV.setText("Post ID:\t\t\t" + postId);
+        postIdTV.setTextColor(0xFFFFFFFF);
 
         popup.addView(widthTV);
         popup.addView(heightTV);
         popup.addView(scoreTV);
         popup.addView(dateTV);
+        popup.addView(postIdTV);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setView(popup).setCancelable(true);
+        builder.setView(popup).setCancelable(true).setNeutralButton(R.string.okay_button, null);
 
         AlertDialog dialog = builder.create();
         dialog.show();
