@@ -14,4 +14,10 @@
         android:showAsAction="never"
         android:title="@string/picture_info"/>
 	
+	<item 
+	    android:id="@+id/picture_tags"
+	    android:orderInCategory="101"
+	    android:showAsAction="never"
+	    android:title="@string/picture_tags"/>
+	
 </menu>

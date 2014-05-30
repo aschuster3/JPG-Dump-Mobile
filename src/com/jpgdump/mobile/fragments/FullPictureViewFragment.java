@@ -2,6 +2,7 @@ package com.jpgdump.mobile.fragments;
 
 import com.jpgdump.mobile.FullPictureViewActivity;
 import com.jpgdump.mobile.R;
+import com.jpgdump.mobile.async.FetchTags;
 import com.jpgdump.mobile.interfaces.VotingInterface.PostType;
 import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 import com.jpgdump.mobile.listeners.GoatPressListener;
@@ -13,6 +14,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.TypedValue;
@@ -168,6 +170,10 @@ public class FullPictureViewFragment extends Fragment
                            Tags.COMMENT_VIEWER_FRAGMENT)
                    .addToBackStack(null)
                    .commit();
+            return true;
+            
+        case R.id.picture_tags:
+            new FetchTags(activity).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, intent.getStringExtra("postId"));
             return true;
             
         case android.R.id.home:

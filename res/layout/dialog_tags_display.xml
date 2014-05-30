@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="5dp"
+    android:orientation="vertical" >
+    
+    <TextView
+        android:id="@+id/approved_tags_label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="2dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="@string/approved_tags_label"/>
+    
+    <TextView
+        android:id="@+id/approved_tags"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:textSize="20sp"/>
+    
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#FF696969"/>
+    
+    <TextView
+        android:id="@+id/unapproved_tags_label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="2dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="@string/unapproved_tags_label"/>
+    
+    <TextView
+        android:id="@+id/unapproved_tags"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:textSize="20sp"/>
+    
+
+</LinearLayout>

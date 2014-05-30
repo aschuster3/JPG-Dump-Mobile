@@ -24,6 +24,8 @@
     <string name="button_content_description">This is a weak or peak button</string>
     <string name="comment_hint">Add your own comment</string>
     <string name="comment_submit">Submit</string>
+    <string name="approved_tags_label">Tags</string>
+    <string name="unapproved_tags_label">Suggested Tags</string>
     
     <!-- Response Code responses -->
     <string name="code200vote">Vote submitted</string>
@@ -45,5 +47,6 @@
     <string name="comments">Comments</string>
     <string name="picture_info">Picture Properties</string>
     <string name="picture_information">Properties</string>
+    <string name="picture_tags">Tags</string>
 
 </resources>
