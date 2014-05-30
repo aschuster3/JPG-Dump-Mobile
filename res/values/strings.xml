@@ -26,6 +26,10 @@
     <string name="comment_submit">Submit</string>
     <string name="approved_tags_label">Tags</string>
     <string name="unapproved_tags_label">Suggested Tags</string>
+    <string name="upload_picture">Upload Picture</string>
+    <string name="cancel">Cancel</string>
+    <string name="existing_picture">Existing Picture</string>
+    <string name="take_photo">Take Photo</string>
     
     <!-- Response Code responses -->
     <string name="code200vote">Vote submitted</string>

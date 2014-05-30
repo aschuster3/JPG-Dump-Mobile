@@ -5,6 +5,8 @@ import java.io.File;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -14,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.util.LruCache;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +24,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.jpgdump.mobile.async.CreateSession;
 import com.jpgdump.mobile.async.FetchPosts;
@@ -309,6 +313,14 @@ public class HomeActivity extends Activity
                 this.recreate();
             }
         }
+        else if(requestCode == Tags.CAMERA_REQUEST_CODE)
+        {
+            Toast.makeText(this, "Cool beans", Toast.LENGTH_SHORT).show();
+        }
+        else if(requestCode == Tags.SELECT_PICTURE)
+        {
+            Toast.makeText(this, "Nice pic, bro", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -343,10 +355,53 @@ public class HomeActivity extends Activity
                 startActivityForResult(intent, Tags.SETTINGS_REQUEST_CODE);
                 return true;
                 
+            //Prompt user to take a picture or choose one from gallery    
+            case R.id.upload_picture:
+                showUploadPrompt();
+                
+                return true;
+                
             //Do default action
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    
+    private void showUploadPrompt()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        
+        builder.setMessage("Upload from your gallery or take a new picture?");
+        builder.setPositiveButton(getResources().getString(R.string.take_photo), new OnClickListener()
+        {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if(intent.resolveActivity(getPackageManager()) != null)
+                {
+                    startActivityForResult(intent, Tags.CAMERA_REQUEST_CODE);
+                }
+            }
+            
+        });
+        builder.setNegativeButton(getResources().getString(R.string.existing_picture), new OnClickListener()
+        {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), Tags.SELECT_PICTURE);
+            }
+            
+        });
+        builder.setNeutralButton(getResources().getString(R.string.cancel), null);
+        builder.create();
+        builder.show();
     }
 
     /*

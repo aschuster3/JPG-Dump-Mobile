@@ -21,6 +21,8 @@ public class Tags
     public static final int SETTINGS_REQUEST_CODE = 101;
     public static final int RESULT_OK = 200;
     public static final int RESULT_CHANGE_MADE = 205;
+    public static final int CAMERA_REQUEST_CODE = 246;
+    public static final int SELECT_PICTURE = 247;
     
     /*Tags*/
     public static final String RETAIN_FRAG = "RetainFragment";
