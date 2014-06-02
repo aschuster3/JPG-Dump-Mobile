@@ -28,4 +28,6 @@ public class Tags
     public static final String RETAIN_FRAG = "RetainFragment";
     public static final String FULL_PICTURE_VIEW_FRAGMENT = "FullPictureViewFragment";
     public static final String COMMENT_VIEWER_FRAGMENT = "CommentViewerFragment";
+    
+    
 }

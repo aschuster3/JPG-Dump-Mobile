@@ -23,13 +23,19 @@
     <string name="okay_button">Okay</string>
     <string name="button_content_description">This is a weak or peak button</string>
     <string name="comment_hint">Add your own comment</string>
-    <string name="comment_submit">Submit</string>
+    <string name="submit">Submit</string>
     <string name="approved_tags_label">Tags</string>
     <string name="unapproved_tags_label">Suggested Tags</string>
     <string name="upload_picture">Upload Picture</string>
     <string name="cancel">Cancel</string>
     <string name="existing_picture">Existing Picture</string>
     <string name="take_photo">Take Photo</string>
+    <string name="tags_text">Tags (Press a submitted tag to erase it):</string>
+    <string name="tag_hint">Add Tags</string>
+    <string name="image_preview">Image preview</string>
+    <string name="enough_tags">That\'s enough tags for now</string>
+    <string name="tag_your_stuff">A picture must have at least 1 tag</string>
+    <string name="error_making_picture">There was an error making space for your picture</string>
     
     <!-- Response Code responses -->
     <string name="code200vote">Vote submitted</string>

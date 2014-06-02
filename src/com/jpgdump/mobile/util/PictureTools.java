@@ -109,4 +109,6 @@ public class PictureTools
         }
         return bmp;
     }
+    
+    
 }

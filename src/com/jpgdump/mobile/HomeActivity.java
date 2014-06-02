@@ -1,7 +1,12 @@
 package com.jpgdump.mobile;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -9,25 +14,39 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.LruCache;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jpgdump.mobile.async.CreateSession;
 import com.jpgdump.mobile.async.FetchPosts;
+import com.jpgdump.mobile.async.UploadPicture;
 import com.jpgdump.mobile.fragments.RetainFragment;
 import com.jpgdump.mobile.listeners.GridPressListener;
 import com.jpgdump.mobile.listeners.NoInternetDialogListener;
@@ -35,6 +54,7 @@ import com.jpgdump.mobile.listeners.PageBottomListener;
 import com.jpgdump.mobile.objects.Post;
 import com.jpgdump.mobile.util.ContextFormattingLogger;
 import com.jpgdump.mobile.util.DiskLruImageCache;
+import com.jpgdump.mobile.util.PictureTools;
 import com.jpgdump.mobile.util.Tags;
 
 public class HomeActivity extends Activity
@@ -47,6 +67,8 @@ public class HomeActivity extends Activity
 
     private GridView pictureGrid;
     private BaseAdapter adapter;
+    
+    private String currentImageFilePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -313,14 +335,148 @@ public class HomeActivity extends Activity
                 this.recreate();
             }
         }
-        else if(requestCode == Tags.CAMERA_REQUEST_CODE)
+        else if((requestCode == Tags.CAMERA_REQUEST_CODE || requestCode == Tags.SELECT_PICTURE)
+                && resultCode == RESULT_OK)
         {
-            Toast.makeText(this, "Cool beans", Toast.LENGTH_SHORT).show();
+            final Bitmap imageBitmap;
+            final String filePath;
+            
+            // Get the file path of the new picture and its thumbnail to show the user
+            if(requestCode == Tags.SELECT_PICTURE)
+            {
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+    
+                Cursor cursor = getContentResolver().query(
+                                   selectedImage, filePathColumn, null, null, null);
+                cursor.moveToFirst();
+    
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                filePath = cursor.getString(columnIndex);
+                cursor.close();
+    
+                Options ops = new Options();
+                
+                ops.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(filePath, ops);
+                
+                ops.inSampleSize = PictureTools.calculateInSampleSize(ops, 80, 60);
+                ops.inJustDecodeBounds = false;
+                
+                imageBitmap = BitmapFactory.decodeFile(filePath, ops);
+            }
+            else
+            {
+                filePath = currentImageFilePath;
+                
+                Options ops = new Options();
+                
+                ops.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(filePath, ops);
+                
+                ops.inSampleSize = PictureTools.calculateInSampleSize(ops, 80, 60);
+                ops.inJustDecodeBounds = false;
+                
+                imageBitmap = BitmapFactory.decodeFile(filePath, ops);
+            }
+            
+            uploadPrompt(imageBitmap, filePath);
         }
-        else if(requestCode == Tags.SELECT_PICTURE)
+    }
+    
+    private void uploadPrompt(final Bitmap imageBitmap,final String filePath)
+    {
+        final ArrayList<String> tags = new ArrayList<String>();
+        
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        
+        final ViewGroup dialogView = (ViewGroup) inflater.inflate(R.layout.dialog_upload_picture, null, false);
+        final ImageView thumbnailPreview = (ImageView) dialogView.findViewById(R.id.image_preview);
+        thumbnailPreview.setImageBitmap(imageBitmap);
+        
+        final LinearLayout currentTags = (LinearLayout) dialogView.findViewById(R.id.tags_text_list);
+        final EditText tagText = (EditText) dialogView.findViewById(R.id.tag_text_field);
+        final Button addTagButton = (Button) dialogView.findViewById(R.id.tag_submit_button);
+        addTagButton.setOnClickListener(new View.OnClickListener()
         {
-            Toast.makeText(this, "Nice pic, bro", Toast.LENGTH_SHORT).show();
-        }
+
+            @Override
+            public void onClick(View view)
+            {
+                if(tags.size() > 4)
+                {
+                    Toast.makeText(HomeActivity.this, 
+                            HomeActivity.this.getResources().getString(R.string.enough_tags), 
+                            Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    TextView newTag = new TextView(HomeActivity.this);
+                    LinearLayout.LayoutParams params = 
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+                    params.topMargin = 10;
+                    params.bottomMargin = 10;
+                    
+                    final String theNewTag = tagText.getText().toString();
+                    
+                    tagText.setText("");
+                    
+                    newTag.setText(theNewTag);
+                    tags.add(theNewTag);
+                    
+                    newTag.setLayoutParams(params);
+                    newTag.setClickable(true);
+                    newTag.setGravity(Gravity.CENTER_HORIZONTAL);
+                    newTag.setTextSize(12f * HomeActivity.this.getResources().getDisplayMetrics().scaledDensity);
+                    newTag.setOnClickListener(new View.OnClickListener()
+                    {
+
+                        @Override
+                        public void onClick(View v)
+                        {
+                            tags.remove(theNewTag);
+                            currentTags.removeView(v);
+                        }
+                        
+                    });
+                    
+                    currentTags.addView(newTag);
+                }
+            }
+            
+        });
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        
+        builder.setView(dialogView)
+               .setTitle(R.string.upload_picture)
+               .setNeutralButton(getResources().getString(R.string.okay_button), new OnClickListener()
+               {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        if(tags.size() < 1)
+                        {
+                            Toast.makeText(HomeActivity.this, 
+                                    HomeActivity.this.getResources().getString(R.string.tag_your_stuff), 
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            SharedPreferences settings = 
+                                    PreferenceManager.getDefaultSharedPreferences(HomeActivity.this);
+                            
+                            new UploadPicture(HomeActivity.this).execute(filePath, 
+                                    settings.getString(Tags.SESSION_KEY, ""),
+                                    settings.getString(Tags.SESSION_ID, ""));
+                        }
+                    }
+                   
+               })
+               .create()
+               .show();
     }
 
     @Override
@@ -381,7 +537,25 @@ public class HomeActivity extends Activity
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if(intent.resolveActivity(getPackageManager()) != null)
                 {
-                    startActivityForResult(intent, Tags.CAMERA_REQUEST_CODE);
+                    File photoFile = null;
+                    try 
+                    {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) 
+                    {
+                        // Error occurred while creating the File
+                        Toast.makeText(HomeActivity.this, 
+                                HomeActivity.this.getResources().getString(R.string.error_making_picture), 
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    
+                    // Continue only if the File was successfully created
+                    if (photoFile != null) 
+                    {
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                Uri.fromFile(photoFile));
+                        startActivityForResult(intent, Tags.CAMERA_REQUEST_CODE);
+                    }
                 }
             }
             
@@ -402,6 +576,37 @@ public class HomeActivity extends Activity
         builder.setNeutralButton(getResources().getString(R.string.cancel), null);
         builder.create();
         builder.show();
+    }
+    
+    @SuppressLint("SimpleDateFormat")
+    private File createImageFile() throws IOException 
+    {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES + "/JPG Dump/");
+        
+        if(!storageDir.exists())
+        {
+            storageDir.mkdir();
+        }
+        
+        File image = File.createTempFile(
+            imageFileName,  /* prefix */
+            ".jpg",         /* suffix */
+            storageDir      /* directory */
+        );
+        
+        currentImageFilePath = image.getAbsolutePath();
+        
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentImageFilePath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+        
+        return image;
     }
 
     /*
