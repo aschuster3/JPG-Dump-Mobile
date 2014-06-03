@@ -468,7 +468,7 @@ public class HomeActivity extends Activity
                             SharedPreferences settings = 
                                     PreferenceManager.getDefaultSharedPreferences(HomeActivity.this);
                             
-                            new UploadPicture(HomeActivity.this).execute(filePath, 
+                            new UploadPicture(HomeActivity.this).execute(filePath, new File(filePath).getName(), 
                                     settings.getString(Tags.SESSION_KEY, ""),
                                     settings.getString(Tags.SESSION_ID, ""));
                         }

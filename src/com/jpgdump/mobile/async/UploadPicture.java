@@ -32,7 +32,7 @@ public class UploadPicture extends AsyncTask<String, Void, Integer>
     {
         UploadInterface uploader = new PictureUploadManager();
         
-        return uploader.uploadPicture(params[0], params[1], params[2]);
+        return uploader.uploadPicture(params[0], params[1], params[2], params[3]);
     }
     
     @Override
