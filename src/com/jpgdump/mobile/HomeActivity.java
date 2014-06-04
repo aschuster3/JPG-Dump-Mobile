@@ -92,7 +92,7 @@ public class HomeActivity extends Activity
             
             if(BuildConfig.DEBUG)
             {
-                log.i("New Session Created: (%s:%s)", 
+                log.i("Session Started: (%s:%s)", 
                     prefs.getString(Tags.SESSION_ID, ""), 
                     prefs.getString(Tags.SESSION_KEY, ""));
             }
@@ -384,13 +384,14 @@ public class HomeActivity extends Activity
         }
     }
     
-    private void uploadPrompt(final Bitmap imageBitmap,final String filePath)
+    private void uploadPrompt(final Bitmap imageBitmap,  final String filePath)
     {
         final ArrayList<String> tags = new ArrayList<String>();
         
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         
         final ViewGroup dialogView = (ViewGroup) inflater.inflate(R.layout.dialog_upload_picture, null, false);
+        final EditText titleText = (EditText) dialogView.findViewById(R.id.post_title);
         final ImageView thumbnailPreview = (ImageView) dialogView.findViewById(R.id.image_preview);
         thumbnailPreview.setImageBitmap(imageBitmap);
         
@@ -465,12 +466,18 @@ public class HomeActivity extends Activity
                         }
                         else
                         {
-                            SharedPreferences settings = 
-                                    PreferenceManager.getDefaultSharedPreferences(HomeActivity.this);
+                            SharedPreferences prefs = HomeActivity.this.getSharedPreferences(Tags.SESSION_INFO, 0);
                             
-                            new UploadPicture(HomeActivity.this).execute(filePath, new File(filePath).getName(), 
-                                    settings.getString(Tags.SESSION_KEY, ""),
-                                    settings.getString(Tags.SESSION_ID, ""));
+                            String[] postInfo = new String[4];
+                            postInfo[0] = filePath;
+                            postInfo[1] = titleText.getText().toString();
+                            postInfo[2] = prefs.getString(Tags.SESSION_KEY, "");
+                            postInfo[3] = prefs.getString(Tags.SESSION_ID, "");
+                            
+                            String[] allTags = new String[tags.size()];
+                            tags.toArray(allTags);
+                            
+                            new UploadPicture(HomeActivity.this).execute(concat(postInfo, allTags));
                         }
                     }
                    
@@ -478,6 +485,16 @@ public class HomeActivity extends Activity
                .create()
                .show();
     }
+    
+    private String[] concat(String[] A, String[] B) 
+    {
+        int aLen = A.length;
+        int bLen = B.length;
+        String[] C= new String[aLen+bLen];
+        System.arraycopy(A, 0, C, 0, aLen);
+        System.arraycopy(B, 0, C, aLen, bLen);
+        return C;
+     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)

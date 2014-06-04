@@ -1,17 +1,26 @@
 package com.jpgdump.mobile.implementation;
 
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import android.util.Base64;
 import android.webkit.MimeTypeMap;
 
-import com.jpgdump.mobile.BuildConfig;
 import com.jpgdump.mobile.interfaces.UploadInterface;
 import com.jpgdump.mobile.util.ContextFormattingLogger;
 
@@ -19,66 +28,97 @@ public class PictureUploadManager implements UploadInterface
 {
     private final ContextFormattingLogger log = ContextFormattingLogger.getLogger(this);
     
+    private final String UPLOAD_URL = "http://jpgdump.com/api/v1/uploads";
+    private final String POST_URL = "http://jpgdump.com/api/v1/posts";
+    
     @Override
-    public int uploadPicture(String filePath, String fileName, String sessionKey, String sessionId)
+    public int uploadPicture(String[] postInfo)//filePath, String title, String sessionKey, String sessionId)
     {
-        String urlToConnect = "http://jpgdump.com/api/v1/uploads";
-        File fileToUpload = new File(filePath);
-        String boundary = "27" + Long.toString(System.currentTimeMillis()); // Just generate some unique random value.
-        byte[] data;
+        String  filePath = postInfo[0],
+                title = postInfo[1],
+                sessionKey = postInfo[2],
+                sessionId = postInfo[3];
         
-        String[] fileType = fileName.split("\\.");
         
-        String  hyphens = "-----------------------------",
-                twoHyphens = "--",
-                imageInfo = " Content-Disposition: form-data; name=\"file\"; filename=\""+ fileName + 
-                        "\" Content-Type: " + 
-                        MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileType[fileType.length - 1]) + " ";
+        log.v("filePath: %s\nsessionKey: %s\nsessionId: %s", filePath,
+                sessionKey, sessionId);
         
         int responseCode = 1337;
+        String url = "";
+        String[] sfn = filePath.split("\\.");
+        String imgType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(sfn[sfn.length - 1]);
+        
+        
+        HttpClient httpclient = new DefaultHttpClient();
+        httpclient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+        
+        // Upload the image
+        HttpPost httppost = new HttpPost(UPLOAD_URL);
+        httppost.addHeader("X-Jpgdump-Session-Key", sessionKey);
+        httppost.addHeader("X-Jpgdump-Session-Id", sessionId);
+        httppost.addHeader("Accept-Language", "en-US,en;q=0.5");
+        httppost.addHeader("User-Agent","Mozilla/5.0 ( compatible ) ");
+        httppost.addHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+          
+        File file = new File(filePath);
+
+        MultipartEntityBuilder mpEntity = MultipartEntityBuilder.create();
+        mpEntity.addTextBody("Content-Dispostion", "form-data");
+        mpEntity.addTextBody("name", "file");
+        mpEntity.addBinaryBody("filename", file, ContentType.create(imgType), file.getName());
+        HttpEntity mpe = mpEntity.build();
+        
+
+        httppost.setEntity(mpe);
+        log.v("Executing request: %s", httppost.getRequestLine());
+        HttpResponse response;
         try
         {
-            URL obj = new URL(urlToConnect);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            response = httpclient.execute(httppost);
+            HttpEntity resEntity = response.getEntity();
             
-            data = IOUtils.toByteArray(new FileInputStream(fileToUpload));
-            
-            con.setRequestMethod("POST");
-            con.setRequestProperty("X-Jpgdump-Session-Key", sessionKey);
-            con.setRequestProperty("X-Jpgdump-Session-Id", sessionId);
-            con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + hyphens + boundary);
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            
-            
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            
-            String wholeDamnThing = hyphens + boundary +imageInfo + 
-                    Base64.encodeToString(data, Base64.NO_PADDING + Base64.NO_WRAP) +
-                    hyphens + boundary + twoHyphens;
-            
-            wr.writeChars(wholeDamnThing);
-//            wr.writeChars(Base64.encodeToString(data, Base64.DEFAULT));
-//            wr.writeChars("\n" + hyphens + boundary + twoHyphens);
-            
-            wr.flush();
-            wr.close();
+            responseCode = 100;
 
-            responseCode = con.getResponseCode();
-            
-            log.i("%s", wholeDamnThing);
-            log.i("Response Message: \n%s", con.getResponseMessage());
-        }
+            log.i(response.getStatusLine().toString());
+            if (resEntity != null) 
+            {
+              JSONObject rawResponse = new JSONObject(EntityUtils.toString(resEntity));
+              url = rawResponse.getString("url");
+              
+              // Post the image
+              httppost = new HttpPost(UPLOAD_URL);
+              httppost.addHeader("X-Jpgdump-Session-Key", sessionKey);
+              httppost.addHeader("X-Jpgdump-Session-Id", sessionId);
+              httppost.addHeader("Accept-Language", "en-US,en;q=0.5");
+              httppost.addHeader("User-Agent","Mozilla/5.0 ( compatible ) ");
+              httppost.addHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+              
+              mpEntity = MultipartEntityBuilder.create();
+              mpEntity.addTextBody("title", title);
+              mpEntity.addTextBody("url", url);
+              
+              httppost.setEntity(mpEntity.build());
+              
+              log.v("Executing request: %s", httppost.getRequestLine());
+              response = httpclient.execute(httppost);
+              
+              resEntity = response.getEntity();
+              
+              responseCode = response.getStatusLine().getStatusCode();
+              
+              resEntity.consumeContent();
+            }
+        } 
         catch (Exception e)
         {
-            if(BuildConfig.DEBUG)
-            {
-                log.i(e.getMessage(), e);
-            }
+            log.e(e, "Exception Body: %s", e.getMessage());
         }
+        
+
+        httpclient.getConnectionManager().shutdown();
+      
         return responseCode;
     }
     
-   // -----------------------------277462624428218 Content-Disposition: form-data; name="file"; filename="dog-hat-pipe.jpg" Content-Type: image/jpeg [picture data] -----------------------------277462624428218--
-
 }

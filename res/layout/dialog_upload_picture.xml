@@ -5,6 +5,13 @@
     android:layout_margin="10dp"
     android:orientation="vertical" >
     
+    <EditText
+        android:id="@+id/post_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:inputType="text" />
+    
     <ImageView
         android:id="@+id/image_preview"
         android:layout_width="wrap_content"
