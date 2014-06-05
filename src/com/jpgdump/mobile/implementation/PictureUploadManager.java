@@ -1,26 +1,22 @@
 package com.jpgdump.mobile.implementation;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.webkit.MimeTypeMap;
 
+import com.jpgdump.mobile.interfaces.TagsInterface;
 import com.jpgdump.mobile.interfaces.UploadInterface;
 import com.jpgdump.mobile.util.ContextFormattingLogger;
 
@@ -43,7 +39,7 @@ public class PictureUploadManager implements UploadInterface
         log.v("filePath: %s\nsessionKey: %s\nsessionId: %s", filePath,
                 sessionKey, sessionId);
         
-        int responseCode = 1337;
+        int responseCode = 0;
         String url = "";
         String[] sfn = filePath.split("\\.");
         String imgType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(sfn[sfn.length - 1]);
@@ -78,16 +74,17 @@ public class PictureUploadManager implements UploadInterface
             response = httpclient.execute(httppost);
             HttpEntity resEntity = response.getEntity();
             
-            responseCode = 100;
+            responseCode = 1;
 
-            log.i(response.getStatusLine().toString());
+            // Log to confirm that previous HTTP Post succeeded
+            log.v(response.getStatusLine().toString());
             if (resEntity != null) 
             {
               JSONObject rawResponse = new JSONObject(EntityUtils.toString(resEntity));
               url = rawResponse.getString("url");
               
               // Post the image
-              httppost = new HttpPost(UPLOAD_URL);
+              httppost = new HttpPost(POST_URL);
               httppost.addHeader("X-Jpgdump-Session-Key", sessionKey);
               httppost.addHeader("X-Jpgdump-Session-Id", sessionId);
               httppost.addHeader("Accept-Language", "en-US,en;q=0.5");
@@ -105,9 +102,24 @@ public class PictureUploadManager implements UploadInterface
               
               resEntity = response.getEntity();
               
-              responseCode = response.getStatusLine().getStatusCode();
-              
-              resEntity.consumeContent();
+              if(resEntity != null)
+              {
+                  log.v(response.getStatusLine().toString());
+                  responseCode = response.getStatusLine().getStatusCode();
+                  
+                  rawResponse = new JSONObject(EntityUtils.toString(resEntity));
+                  
+                  TagsInterface tagger = new TagsManager();
+                  
+                  for(int i = 4; i < postInfo.length; i++)
+                  {
+                      // Tag the image
+                      responseCode = tagger.tagPicture(rawResponse.getString("id"), 
+                              sessionKey, sessionId, postInfo[i]);
+                  }
+                  
+                  resEntity.consumeContent();
+              }
             }
         } 
         catch (Exception e)

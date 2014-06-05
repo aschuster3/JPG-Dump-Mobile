@@ -1,6 +1,7 @@
 package com.jpgdump.mobile.implementation;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -88,6 +89,47 @@ public class TagsManager implements TagsInterface
             log.e("The JSON has returned something unexpected", e);
         }
         return tags;
+    }
+
+    @Override
+    public int tagPicture(String picId, String sessionKey, String sessionId, String tag)
+    {
+        int responseCode = 2;
+        final String TAG_URL = "http://jpgdump.com/api/v1/tags";
+        String params;
+        
+        // Make sure empty tags are not submitted
+        if(!tag.equals(""))
+        {
+            URL obj;
+            params = "tag=" + tag + "&postId=" + picId;
+            
+            try
+            {
+                obj = new URL(TAG_URL);
+                HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+                
+                con.setRequestMethod("POST");
+                con.setRequestProperty("X-Jpgdump-Session-Key", sessionKey);
+                con.setRequestProperty("X-Jpgdump-Session-Id", sessionId);
+                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+                
+                con.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.writeBytes(params);
+                wr.flush();
+                wr.close();
+    
+                responseCode = con.getResponseCode();
+            }
+            catch (Exception e)
+            {
+                log.e(e.getMessage(), e);
+            }
+        }
+            
+        
+        return responseCode;
     }
 
 }

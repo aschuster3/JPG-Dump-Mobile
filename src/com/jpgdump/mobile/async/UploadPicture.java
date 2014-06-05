@@ -42,12 +42,35 @@ public class UploadPicture extends AsyncTask<String, Void, Integer>
         
         switch(responseCode)
         {
+            case 0:
+                // Failed to upload
+                break;
+                
+            case 1:
+                // Failed to post
+                break;
+                
+            case 2:
+                // Tags failed
+                break;
+                
             case 200:
                 Toast.makeText(activity, "Successfully posted", Toast.LENGTH_SHORT).show();
+                activity.getIntent().putExtra("reset", true);
+                activity.recreate();
+                break;
+                
+            case 400:
+                // Bad request (Shouldn't happen)
+                break;
+                
+            case 403:
+                // Error in session
+                break;
                 
             default:
                 Toast.makeText(activity, "You dun goofed: " + responseCode, Toast.LENGTH_SHORT).show();
-                
+                break;
         }
     }
 

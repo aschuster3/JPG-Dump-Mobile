@@ -1,18 +1,24 @@
 package com.jpgdump.mobile.fragments;
 
+import java.util.ArrayList;
+
 import com.jpgdump.mobile.FullPictureViewActivity;
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.async.FetchTags;
+import com.jpgdump.mobile.async.SuggestTags;
 import com.jpgdump.mobile.interfaces.VotingInterface.PostType;
 import com.jpgdump.mobile.interfaces.VotingInterface.VoteType;
 import com.jpgdump.mobile.listeners.GoatPressListener;
+import com.jpgdump.mobile.listeners.TagAddClickListener;
 import com.jpgdump.mobile.util.Tags;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,9 +29,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -156,8 +164,8 @@ public class FullPictureViewFragment extends Fragment
         {
         case R.id.picture_info:
             pictureInfoPopup(activity, intent);
-
-            return true;
+            break;
+            
         case R.id.comments:
             FragmentManager manager = getActivity().getFragmentManager();
             
@@ -170,19 +178,25 @@ public class FullPictureViewFragment extends Fragment
                            Tags.COMMENT_VIEWER_FRAGMENT)
                    .addToBackStack(null)
                    .commit();
-            return true;
+            break;
             
         case R.id.picture_tags:
             new FetchTags(activity).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, intent.getStringExtra("postId"));
-            return true;
+            break;
+            
+        case R.id.picture_suggest_tags:
+            suggestTagsDialogPopup();
+            break;
             
         case android.R.id.home:
             activity.onBackPressed();
+            break;
             
         default:
             return super.onOptionsItemSelected(item);
             
         }
+        return true;
     }
 
     private float pxFromDp(float dp)
@@ -261,5 +275,67 @@ public class FullPictureViewFragment extends Fragment
         dialog.getWindow().setLayout((int) pxFromDp(250),
                 (int) pxFromDp(300));
     }
+    
+    private void suggestTagsDialogPopup()
+    {
+        final ArrayList<String> tags = new ArrayList<String>();
+        LayoutInflater inflater = (LayoutInflater) this.getActivity()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        
+        View tagView = inflater.inflate(R.layout.dialog_suggest_tags, null, false);
+        
+        EditText tagSuggestion = (EditText) tagView.findViewById(R.id.tag_text_field);
+        LinearLayout currentTags = (LinearLayout) tagView.findViewById(R.id.tags_text_list);
+        Button submitButton = (Button) tagView.findViewById(R.id.tag_submit_button);
+        
+        submitButton.setOnClickListener(new TagAddClickListener(this.getActivity(), 
+                tagSuggestion, currentTags, tags));
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setTitle("Suggest Tags");
+        builder.setView(tagView);
+        builder.setNeutralButton(R.string.okay_button, null);
+        builder.setNegativeButton(R.string.cancel, null);
+        
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        
+        SharedPreferences prefs = this.getActivity().getSharedPreferences(Tags.SESSION_INFO, 0);
+        
+        final String    postId = this.getActivity().getIntent().getStringExtra("postId"),
+                        sessionKey = prefs.getString(Tags.SESSION_KEY, ""),
+                        sessionId = prefs.getString(Tags.SESSION_ID, "");
+        
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+              .setOnClickListener(new OnClickListener(){
+
+            @Override
+            public void onClick(View v)
+            {
+                String[] postInfo = new String[3];
+                postInfo[0] = postId;
+                postInfo[1] = sessionKey;
+                postInfo[2] = sessionId;
+                
+                String[] finalTags = new String[tags.size()];
+                tags.toArray(finalTags);
+                
+                new SuggestTags(FullPictureViewFragment.this.getActivity()).execute(concat(postInfo, finalTags));
+                
+                dialog.dismiss();
+            }
+            
+        });
+    }
+    
+    private String[] concat(String[] A, String[] B) 
+    {
+        int aLen = A.length;
+        int bLen = B.length;
+        String[] C= new String[aLen+bLen];
+        System.arraycopy(A, 0, C, 0, aLen);
+        System.arraycopy(B, 0, C, aLen, bLen);
+        return C;
+     }
 
 }

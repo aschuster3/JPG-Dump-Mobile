@@ -10,7 +10,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +26,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.LruCache;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +39,6 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jpgdump.mobile.async.CreateSession;
@@ -51,6 +48,8 @@ import com.jpgdump.mobile.fragments.RetainFragment;
 import com.jpgdump.mobile.listeners.GridPressListener;
 import com.jpgdump.mobile.listeners.NoInternetDialogListener;
 import com.jpgdump.mobile.listeners.PageBottomListener;
+import com.jpgdump.mobile.listeners.TagAddClickListener;
+import com.jpgdump.mobile.listeners.UploadPromptClickListener;
 import com.jpgdump.mobile.objects.Post;
 import com.jpgdump.mobile.util.ContextFormattingLogger;
 import com.jpgdump.mobile.util.DiskLruImageCache;
@@ -285,102 +284,110 @@ public class HomeActivity extends Activity
             log.i("Reached onActivityResult()");
         }
         
-        if(requestCode == Tags.POST_REQUEST_CODE)
+        if(requestCode == Tags.POST_REQUEST_CODE &&
+                resultCode == Tags.RESULT_OK)
         {
-            if(resultCode == Tags.RESULT_OK)
-            {
-                int position = data.getIntExtra("position", -1);
-                int goatVal = data.getIntExtra("goatVal", 0);
-                
-                if(BuildConfig.DEBUG)
-                {
-                    log.i("Request and result code worked! Position:%d goalVal: %d", position, goatVal);
-                }
-                
-                if(position != -1)
-                {
-                    RetainFragment retainFragment = RetainFragment
-                            .findOrCreateRetainFragment(getFragmentManager());
-                    
-                    /*
-                     * This checks to see if memory has been cleared since the app was 
-                     * first opened.  If the retainedAdapter doesn't exist, the home
-                     * screen will refresh.
-                     */
-                    if(retainFragment.retainedAdapter != null)
-                    {
-                        Post post = (Post) retainFragment.retainedAdapter.getItem(position);
-                        if(goatVal == 1)
-                        {
-                            post.addUpvote();
-                        }
-                        else if(goatVal == -1)
-                        {
-                            post.addDownvote();
-                        }
-                    }
-                    else
-                    {
-                        getIntent().putExtra("reset", true);
-                        this.recreate();
-                    }
-                }
-            }
+            updatePost(data);
         }
-        else if(requestCode == Tags.SETTINGS_REQUEST_CODE)
+        else if(requestCode == Tags.SETTINGS_REQUEST_CODE &&
+                resultCode == Tags.RESULT_CHANGE_MADE)
         {
-            if(resultCode == Tags.RESULT_CHANGE_MADE)
-            {
-                getIntent().putExtra("reset", true);
-                this.recreate();
-            }
+            getIntent().putExtra("reset", true);
+            this.recreate();
         }
-        else if((requestCode == Tags.CAMERA_REQUEST_CODE || requestCode == Tags.SELECT_PICTURE)
-                && resultCode == RESULT_OK)
+        else if(requestCode == Tags.SELECT_PICTURE &&
+                resultCode == RESULT_OK)
         {
             final Bitmap imageBitmap;
             final String filePath;
             
-            // Get the file path of the new picture and its thumbnail to show the user
-            if(requestCode == Tags.SELECT_PICTURE)
+            // Get the filePath variable set
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+            Cursor cursor = getContentResolver().query(
+                               selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            filePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            // Build the image from the filePath
+            Options ops = new Options();
+            
+            ops.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(filePath, ops);
+            
+            ops.inSampleSize = PictureTools.calculateInSampleSize(ops, 80, 60);
+            ops.inJustDecodeBounds = false;
+            
+            imageBitmap = BitmapFactory.decodeFile(filePath, ops);
+            
+            uploadPrompt(imageBitmap, filePath);
+            
+        }
+        else if(requestCode == Tags.CAMERA_REQUEST_CODE &&
+                resultCode == RESULT_OK)
+        {
+            final Bitmap imageBitmap;
+            final String filePath;
+            
+            // Set by createImageFile() method listed below
+            filePath = currentImageFilePath;
+            
+            // Build image from filePath
+            Options ops = new Options();
+            
+            ops.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(filePath, ops);
+            
+            ops.inSampleSize = PictureTools.calculateInSampleSize(ops, 80, 60);
+            ops.inJustDecodeBounds = false;
+            
+            imageBitmap = BitmapFactory.decodeFile(filePath, ops);
+            
+            uploadPrompt(imageBitmap, filePath);
+        }
+    }
+    
+    private void updatePost(Intent data)
+    {
+        int position = data.getIntExtra("position", -1);
+        int goatVal = data.getIntExtra("goatVal", 0);
+        
+        if(BuildConfig.DEBUG)
+        {
+            log.i("Request and result code worked! Position:%d goalVal: %d", position, goatVal);
+        }
+        
+        if(position != -1)
+        {
+            RetainFragment retainFragment = RetainFragment
+                    .findOrCreateRetainFragment(getFragmentManager());
+            
+            /*
+             * This checks to see if memory has been cleared since the app was 
+             * first opened.  If the retainedAdapter doesn't exist, the home
+             * screen will refresh.
+             */
+            if(retainFragment.retainedAdapter != null)
             {
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-    
-                Cursor cursor = getContentResolver().query(
-                                   selectedImage, filePathColumn, null, null, null);
-                cursor.moveToFirst();
-    
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                filePath = cursor.getString(columnIndex);
-                cursor.close();
-    
-                Options ops = new Options();
-                
-                ops.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(filePath, ops);
-                
-                ops.inSampleSize = PictureTools.calculateInSampleSize(ops, 80, 60);
-                ops.inJustDecodeBounds = false;
-                
-                imageBitmap = BitmapFactory.decodeFile(filePath, ops);
+                Post post = (Post) retainFragment.retainedAdapter.getItem(position);
+                if(goatVal == 1)
+                {
+                    post.addUpvote();
+                }
+                else if(goatVal == -1)
+                {
+                    post.addDownvote();
+                }
             }
             else
             {
-                filePath = currentImageFilePath;
-                
-                Options ops = new Options();
-                
-                ops.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(filePath, ops);
-                
-                ops.inSampleSize = PictureTools.calculateInSampleSize(ops, 80, 60);
-                ops.inJustDecodeBounds = false;
-                
-                imageBitmap = BitmapFactory.decodeFile(filePath, ops);
+                getIntent().putExtra("reset", true);
+                this.recreate();
             }
-            
-            uploadPrompt(imageBitmap, filePath);
         }
     }
     
@@ -398,65 +405,22 @@ public class HomeActivity extends Activity
         final LinearLayout currentTags = (LinearLayout) dialogView.findViewById(R.id.tags_text_list);
         final EditText tagText = (EditText) dialogView.findViewById(R.id.tag_text_field);
         final Button addTagButton = (Button) dialogView.findViewById(R.id.tag_submit_button);
-        addTagButton.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View view)
-            {
-                if(tags.size() > 4)
-                {
-                    Toast.makeText(HomeActivity.this, 
-                            HomeActivity.this.getResources().getString(R.string.enough_tags), 
-                            Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    TextView newTag = new TextView(HomeActivity.this);
-                    LinearLayout.LayoutParams params = 
-                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT);
-                    params.topMargin = 10;
-                    params.bottomMargin = 10;
-                    
-                    final String theNewTag = tagText.getText().toString();
-                    
-                    tagText.setText("");
-                    
-                    newTag.setText(theNewTag);
-                    tags.add(theNewTag);
-                    
-                    newTag.setLayoutParams(params);
-                    newTag.setClickable(true);
-                    newTag.setGravity(Gravity.CENTER_HORIZONTAL);
-                    newTag.setTextSize(12f * HomeActivity.this.getResources().getDisplayMetrics().scaledDensity);
-                    newTag.setOnClickListener(new View.OnClickListener()
-                    {
-
-                        @Override
-                        public void onClick(View v)
-                        {
-                            tags.remove(theNewTag);
-                            currentTags.removeView(v);
-                        }
-                        
-                    });
-                    
-                    currentTags.addView(newTag);
-                }
-            }
-            
-        });
+        addTagButton.setOnClickListener(new TagAddClickListener(this, tagText, currentTags, tags));
         
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         
         builder.setView(dialogView)
                .setTitle(R.string.upload_picture)
-               .setNeutralButton(getResources().getString(R.string.okay_button), new OnClickListener()
+               .setNeutralButton(getResources().getString(R.string.okay_button), null);
+        final AlertDialog dialog = builder.create();
+        
+        dialog.show();
+        
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
                {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
+                    public void onClick(View view)
                     {
                         if(tags.size() < 1)
                         {
@@ -478,12 +442,13 @@ public class HomeActivity extends Activity
                             tags.toArray(allTags);
                             
                             new UploadPicture(HomeActivity.this).execute(concat(postInfo, allTags));
+                            dialog.dismiss();
                         }
                     }
                    
-               })
-               .create()
-               .show();
+               });
+        
+        
     }
     
     private String[] concat(String[] A, String[] B) 
@@ -543,60 +508,18 @@ public class HomeActivity extends Activity
     private void showUploadPrompt()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        OnClickListener listener = new UploadPromptClickListener(this);
         
         builder.setMessage("Upload from your gallery or take a new picture?");
-        builder.setPositiveButton(getResources().getString(R.string.take_photo), new OnClickListener()
-        {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if(intent.resolveActivity(getPackageManager()) != null)
-                {
-                    File photoFile = null;
-                    try 
-                    {
-                        photoFile = createImageFile();
-                    } catch (IOException ex) 
-                    {
-                        // Error occurred while creating the File
-                        Toast.makeText(HomeActivity.this, 
-                                HomeActivity.this.getResources().getString(R.string.error_making_picture), 
-                                Toast.LENGTH_SHORT).show();
-                    }
-                    
-                    // Continue only if the File was successfully created
-                    if (photoFile != null) 
-                    {
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                                Uri.fromFile(photoFile));
-                        startActivityForResult(intent, Tags.CAMERA_REQUEST_CODE);
-                    }
-                }
-            }
-            
-        });
-        builder.setNegativeButton(getResources().getString(R.string.existing_picture), new OnClickListener()
-        {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), Tags.SELECT_PICTURE);
-            }
-            
-        });
+        builder.setPositiveButton(getResources().getString(R.string.take_photo), listener);
+        builder.setNegativeButton(getResources().getString(R.string.existing_picture), listener);
         builder.setNeutralButton(getResources().getString(R.string.cancel), null);
         builder.create();
         builder.show();
     }
     
     @SuppressLint("SimpleDateFormat")
-    private File createImageFile() throws IOException 
+    public File createImageFile() throws IOException 
     {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());

@@ -10,14 +10,21 @@
     
 	<item
 	    android:id="@+id/picture_info"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:showAsAction="never"
         android:title="@string/picture_info"/>
 	
 	<item 
 	    android:id="@+id/picture_tags"
-	    android:orderInCategory="101"
+	    android:orderInCategory="100"
 	    android:showAsAction="never"
 	    android:title="@string/picture_tags"/>
+	
+	<item 
+	    android:id="@+id/picture_suggest_tags"
+	    android:orderInCategory="99"
+	    android:showAsAction="never"
+	    android:title="@string/picture_suggest_tags"/>
+	
 	
 </menu>

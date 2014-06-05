@@ -18,6 +18,6 @@
         android:orderInCategory="2"
         android:showAsAction="ifRoom"
         android:title="@string/upload_picture"
-        android:icon="@android:drawable/ic_menu_upload"/>
+        android:icon="@drawable/ic_action_upload"/>
 
 </menu>

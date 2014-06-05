@@ -36,6 +36,8 @@
     <string name="enough_tags">That\'s enough tags for now</string>
     <string name="tag_your_stuff">A picture must have at least 1 tag</string>
     <string name="error_making_picture">There was an error making space for your picture</string>
+    <string name="no_comments">This post has no comments</string>
+    <string name="add">Add</string>
     
     <!-- Response Code responses -->
     <string name="code200vote">Vote submitted</string>
@@ -58,5 +60,6 @@
     <string name="picture_info">Picture Properties</string>
     <string name="picture_information">Properties</string>
     <string name="picture_tags">Tags</string>
+    <string name="picture_suggest_tags">Suggest Tags</string>
 
 </resources>

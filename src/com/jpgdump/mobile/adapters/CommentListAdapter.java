@@ -52,6 +52,14 @@ public class CommentListAdapter extends BaseAdapter
     {
         return comments.get(position);
     }
+    
+    @Override
+    public boolean isEmpty()
+    {
+        // Done so as to allow a header to be displayed
+        // when there are no items in the view
+        return false;
+    }
 
     @Override
     public long getItemId(int position)

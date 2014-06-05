@@ -4,10 +4,13 @@ import java.util.List;
 
 import android.app.Fragment;
 import android.os.AsyncTask;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.jpgdump.mobile.R;
 import com.jpgdump.mobile.adapters.CommentListAdapter;
@@ -52,12 +55,20 @@ public class FetchComments extends AsyncTask<String, Void, List<Comment>>
             ListView commentList = (ListView) view.findViewById(R.id.comments_list);
             EditText commentTextField = (EditText) view.findViewById(R.id.comment_text_field);
             
-            if(comments.size() != 0)
+            BaseAdapter commentViewAdapter = new CommentListAdapter(fragment.getActivity(), commentTextField, comments);
+            
+            if(comments.size() < 1)
             {
-                BaseAdapter commentViewAdapter = new CommentListAdapter(fragment.getActivity(), commentTextField, comments);
+                TextView noComments = new TextView(fragment.getActivity());
                 
-                commentList.setAdapter(commentViewAdapter);
+                noComments.setText(R.string.no_comments);
+                noComments.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                noComments.setGravity(Gravity.CENTER);
+                
+                commentList.addHeaderView(noComments);
             }
+                
+            commentList.setAdapter(commentViewAdapter);
         }
     }
 }

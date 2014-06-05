@@ -17,6 +17,11 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <item name="android:windowBackground">@drawable/jpg_dump_background</item>
+        <item name="android:actionOverflowButtonStyle">@style/OverFlow</item>
     </style>
+    
+    <style name="OverFlow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
+    	<item name="android:src">@drawable/ic_action_overflow</item>
+	</style>
 
 </resources>
