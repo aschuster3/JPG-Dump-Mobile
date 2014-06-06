@@ -23,6 +23,7 @@
         android:id="@+id/tags_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:gravity="center"
         android:textSize="18sp"
         android:text="@string/tags_text"/>
