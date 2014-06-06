@@ -26,7 +26,7 @@ public class DiskLruImageCache
     
     
     private CompressFormat mCompressFormat = CompressFormat.JPEG;
-    private int mCompressQuality = 80;
+    private int mCompressQuality = 50;
     private static final int APP_VERSION = 1;
     private static final int VALUE_COUNT = 1;
 
