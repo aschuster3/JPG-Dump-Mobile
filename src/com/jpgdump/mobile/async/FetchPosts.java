@@ -2,6 +2,7 @@ package com.jpgdump.mobile.async;
 
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.os.AsyncTask;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.GridView;
@@ -60,34 +61,46 @@ public final class FetchPosts extends AsyncTask<String, Void, List<Post>>
             log.v(posts.toString());
             log.v("Done");
         }
-        GridView grid = (GridView) activity.findViewById(R.id.picture_viewer_activity_home);
-        GridDisplayAdapter adapter = (GridDisplayAdapter) grid.getAdapter();
-        if(adapter == null)
+        if(posts.get(0).getKind().equals("Error"))
         {
-            adapter = new GridDisplayAdapter(activity, posts);
-            OnScrollListener scrollListener = new PageBottomListener(activity, retainFragment);
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             
-            grid.setAdapter(adapter);
-            grid.setOnScrollListener(scrollListener);
+            builder.setTitle(activity.getString(R.string.so_long_folks))
+                   .setMessage(activity.getString(R.string.farewell_body))
+                   .create()
+                   .show();
         }
         else
         {
-            adapter.addItems(posts);
-            adapter.notifyDataSetChanged();
-        }
-
-        retainFragment.retainedAdapter = adapter;
-        
-        /*
-         * Add posts as a variable to the retainFragment
-         * If less than 4 images are left to be loaded, a new batch can be signaled
-         */
-        
-        int postSize = posts.size();
-        for(int x = 0; x < postSize; x++)
-        {
-            new LoadPicture(activity, adapter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, posts.get(x));            
-            pageBottomListenerFlag = (postSize - x) < 4;
+            GridView grid = (GridView) activity.findViewById(R.id.picture_viewer_activity_home);
+            GridDisplayAdapter adapter = (GridDisplayAdapter) grid.getAdapter();
+            if(adapter == null)
+            {
+                adapter = new GridDisplayAdapter(activity, posts);
+                OnScrollListener scrollListener = new PageBottomListener(activity, retainFragment);
+                
+                grid.setAdapter(adapter);
+                grid.setOnScrollListener(scrollListener);
+            }
+            else
+            {
+                adapter.addItems(posts);
+                adapter.notifyDataSetChanged();
+            }
+    
+            retainFragment.retainedAdapter = adapter;
+            
+            /*
+             * Add posts as a variable to the retainFragment
+             * If less than 4 images are left to be loaded, a new batch can be signaled
+             */
+            
+            int postSize = posts.size();
+            for(int x = 0; x < postSize; x++)
+            {
+                new LoadPicture(activity, adapter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, posts.get(x));            
+                pageBottomListenerFlag = (postSize - x) < 4;
+            }
         }
     }
     

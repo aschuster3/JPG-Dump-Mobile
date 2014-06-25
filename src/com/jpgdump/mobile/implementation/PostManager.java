@@ -86,6 +86,8 @@ public class PostManager implements PostsInterface
         {
             // Intentionally ignore error.
             log.e("The URL is misformed", e);
+            Post errorPost = new Post("Error", "-1", "", "", "", "", 0, "", "", "", "", "");
+            posts.add(errorPost);
         }
         catch (IOException e)
         {
